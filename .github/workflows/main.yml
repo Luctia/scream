@@ -1,4 +1,8 @@
 name: test
+
+permissions:
+    checks: write
+
 on:
   push:
     branches:
