@@ -1,7 +1,9 @@
 name: test
 
 permissions:
-    checks: write
+  contents: read
+  checks: write
+  id-token: write
 
 on:
   push:
