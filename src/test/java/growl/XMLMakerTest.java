@@ -1,13 +1,18 @@
 package growl;
 
+import growl.domain.Configuration;
 import growl.domain.Sampler;
 import growl.domain.TestSpecs;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class XMLMakerTest {
     @Test
@@ -139,5 +144,23 @@ public class XMLMakerTest {
                 </hashTree>
                 """;
         assertEquals(expectedXML, testSpecs.toXML());
+    }
+
+    @Test
+    void Should_Properly_Construct_XML() {
+        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/sample.json");
+        String expectedOutput = "";
+        try {
+            expectedOutput = Files.readString(Path.of("src/test/resources/testid.jmx"));
+        } catch (IOException e) {
+            fail("File containing expected output not found");
+        }
+        assert config != null;
+        // When asserting, we need to remove some prettifying and double newlines. These do not change the validity or
+        //  functionality of the file.
+        assertEquals(
+                expectedOutput.replaceAll("\n *", "\n"),
+                XMLMaker.createTestplanXML(config).replaceAll("\n\n", "\n")
+        );
     }
 }
