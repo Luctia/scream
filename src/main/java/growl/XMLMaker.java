@@ -8,22 +8,25 @@ import growl.domain.Configuration;
  */
 public class XMLMaker {
     /**
-     * Transform the configuration to JMeter-compatible XML.
+     * Transform the configuration to JMeter-compatible Testplan XML.
      * @param configuration the configuration to be used
      * @return the resulting XML as a string
      */
-    String createXML(Configuration configuration) {
-        String output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-
-        return output;
+    String createTestplanXML(Configuration configuration) {
+        return String.format("""
+                <?xml version="1.0" encoding="UTF-8"?>
+                <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+                %s
+                </jmeterTestPlan>
+                """, configuration.toXML());
     }
 
     /**
-     * Export the configuration as a JMeter-compatible XML file.
+     * Export the configuration as a JMeter-compatible Testplan XML file.
      * @param configuration the configuration to be used
      */
     void exportXML(Configuration configuration) {
-        String xml = createXML(configuration);
+        String xml = createTestplanXML(configuration);
         // TODO save as XML file
     }
 }
