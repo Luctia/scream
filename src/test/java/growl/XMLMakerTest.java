@@ -163,4 +163,9 @@ public class XMLMakerTest {
                 XMLMaker.createTestplanXML(config).replaceAll("\n\n", "\n")
         );
     }
+
+    @Test
+    void Should_Pretty_Print_To_File() {
+
+    }
 }
