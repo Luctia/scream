@@ -35,8 +35,9 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
                 <stringProp name="WhileController.condition">${__jexl3(&quot;${responseCode}&quot; != 200,)}</stringProp>
                 </WhileController>
                 <hashTree>
-                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Health Check">
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Health check">
                 <stringProp name="HTTPSampler.domain">%s</stringProp>
+                <stringProp name="HTTPSampler.protocol">%s</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">GET</stringProp>
                 <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -63,6 +64,7 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
                 <hashTree/>
                 </hashTree>
                 """;
-        return String.format(base, healthCheckUrl);
+        // TODO determine protocol
+        return String.format(base, healthCheckUrl, "http");
     }
 }

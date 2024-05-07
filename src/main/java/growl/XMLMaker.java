@@ -24,14 +24,14 @@ public class XMLMaker {
      * @param configuration the configuration to be used
      * @return the resulting XML as a string
      */
-    static String createTestplanXML(Configuration configuration) {
-        return String.format("""
+    static String createTestplanXML(Configuration configuration, boolean prettyPrint) {
+        String uglyXML = String.format("""
                 <?xml version="1.0" encoding="UTF-8"?>
                 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
                 %s
                 </jmeterTestPlan>
-                """, configuration.toXML())
-                .replaceAll("\n\n", "\n");
+                """, configuration.toXML());
+        return prettyPrint ? prettyPrintByTransformer(uglyXML) : uglyXML;
     }
 
     /**
@@ -39,8 +39,7 @@ public class XMLMaker {
      * @param configuration the configuration to be used
      */
     static void exportXML(Configuration configuration, boolean prettyPrint) {
-        String xml = createTestplanXML(configuration);
-        if (prettyPrint) xml = prettyPrintByTransformer(xml);
+        String xml = createTestplanXML(configuration, prettyPrint);
         try {
             PrintWriter writer = new PrintWriter("config.jmx");
             writer.print(xml);
