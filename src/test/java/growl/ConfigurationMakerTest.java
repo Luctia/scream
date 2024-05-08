@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ConfigurationMakerTest {
     @Test
     void Should_Parse_Simple_Configuration_From_JSON_File() {
-        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/sample.json");
+        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/unorderedWithHealth.json");
         assertNotNull(config);
         assertEquals("azure", config.platform());
         assertEquals("presentation-tier", config.images().getFirst().id());

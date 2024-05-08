@@ -29,8 +29,8 @@ public class ConfigurationMaker {
      */
     public static Configuration makeConfigurationFromFilename(String filename) {
         try {
-            File myObj = new File(filename);
-            Scanner myReader = new Scanner(myObj);
+            File growlJson = new File(filename);
+            Scanner myReader = new Scanner(growlJson);
             StringBuilder jsonString = new StringBuilder();
             while (myReader.hasNextLine()) {
                 jsonString.append(myReader.nextLine());
