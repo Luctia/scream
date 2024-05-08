@@ -38,9 +38,8 @@ public class ConfigurationMaker {
             myReader.close();
             return makeConfiguration(jsonString.toString());
         } catch (FileNotFoundException e) {
-            System.err.println("An error occurred.");
-            e.printStackTrace();
+            System.err.println("File not found: " + filename);
+            throw new RuntimeException(e);
         }
-        return null;
     }
 }
