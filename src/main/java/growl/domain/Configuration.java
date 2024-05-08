@@ -23,13 +23,12 @@ public record Configuration(String platform, List<Image> images, TestSpecs tests
 
     /**
      * Creates a thread group configuration with 5 threads, 0 ramp-up time and no loops.
-     * TODO this should be derived from configuration settings instead of being static.
      */
     private String createThreadGroupConfiguration() {
-        return """
+        return String.format("""
                 <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
-                <intProp name="ThreadGroup.num_threads">5</intProp>
-                <intProp name="ThreadGroup.ramp_time">0</intProp>
+                <intProp name="ThreadGroup.num_threads">%s</intProp>
+                <intProp name="ThreadGroup.ramp_time">50</intProp>
                 <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
                 <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
@@ -37,6 +36,6 @@ public record Configuration(String platform, List<Image> images, TestSpecs tests
                 <boolProp name="LoopController.continue_forever">false</boolProp>
                 </elementProp>
                 </ThreadGroup>
-                """;
+                """, performance.throughput());
     }
 }
