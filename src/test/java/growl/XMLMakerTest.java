@@ -235,7 +235,7 @@ public class XMLMakerTest {
         Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/unorderedWithoutHealth.json");
         String expectedOutput = "";
         try {
-            expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/testid.jmx"));
+            expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/unorderedWithoutHealth.jmx"));
         } catch (IOException e) {
             fail("File containing expected output not found");
         }
@@ -258,11 +258,14 @@ public class XMLMakerTest {
             fail("File containing expected output not found");
         }
         assert config != null;
-        // When asserting, we need to remove some prettifying and double newlines. These do not change the validity or
-        //  functionality of the file.
-        assertEquals(
-                expectedOutput,
-                XMLMaker.createTestplanXML(config, true)
-        );
+        XMLMaker.exportXML(config, true);
+        try {
+            assertEquals(
+                    expectedOutput,
+                    Files.readString(Path.of("config.jmx"))
+            );
+        } catch (IOException e) {
+            fail("Config not exported");
+        }
     }
 }
