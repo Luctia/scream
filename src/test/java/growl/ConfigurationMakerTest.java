@@ -1,8 +1,10 @@
 package growl;
 
-import growl.domain.Configuration;
-import growl.domain.Sampler;
+import growl.domain.*;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +34,7 @@ public class ConfigurationMakerTest {
         assertEquals("{\"someProperty\": true}", config.tests().samplers().getFirst().requestBody());
 
         assertEquals(24050, config.performance().throughput());
-        assertEquals("MINUTE", config.performance().throughputTimeUnit());
+        assertEquals(PerformanceDemands.TimeUnit.MINUTE, config.performance().throughputTimeUnit());
         assertEquals(50, config.performance().latency());
     }
 
@@ -94,7 +96,53 @@ public class ConfigurationMakerTest {
         assertEquals("{\"someProperty\": true}", config.tests().samplers().getFirst().requestBody());
 
         assertEquals(24050, config.performance().throughput());
-        assertEquals("MINUTE", config.performance().throughputTimeUnit());
+        assertEquals(PerformanceDemands.TimeUnit.MINUTE, config.performance().throughputTimeUnit());
         assertEquals(50, config.performance().latency());
+    }
+
+    @Test
+    void Throw_On_Invalid_File_Name() {
+        assertThrows(RuntimeException.class, () -> ConfigurationMaker.makeConfigurationFromFilename("thisFileDoesNotExist.json"));
+    }
+
+    @Test
+    void Throw_On_Invalid_JSON() {
+        assertThrows(RuntimeException.class, () -> ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/brokenJSON.json"));
+    }
+
+    @Test
+    void Enforces_Record_Requirements() {
+        // Start with required fields
+        assertThrows(NullPointerException.class, () -> new Configuration(null, new ArrayList<>(), null, null));
+        assertThrows(NullPointerException.class, () -> new Image(null, null, 0, false, 0, null));
+        assertThrows(NullPointerException.class, () -> new TestSpecs(null, false, null));
+        assertThrows(NullPointerException.class, () -> new Sampler(null, null, 0, null));
+
+        // Test lists not being empty
+        assertThrows(IllegalArgumentException.class, () -> new Configuration("azure", new ArrayList<>(), null, null));
+
+        assertThrows(IllegalArgumentException.class, () -> new TestSpecs(null, false, new ArrayList<>()));
+
+        // Test not-negative requirements
+        assertThrows(IllegalArgumentException.class, () -> new Image("id", "id", -1, false, 1, null));
+        assertThrows(IllegalArgumentException.class, () -> new Image("id", "id", 0, false, 1, null));
+        assertThrows(IllegalArgumentException.class, () -> new Image("id", "id", 65536, false, 1, null));
+        assertThrows(IllegalArgumentException.class, () -> new Image("id", "id", 1, false, 0, null));
+        assertThrows(IllegalArgumentException.class, () -> new Image("id", "id", 1, false, -1, null));
+
+        assertThrows(IllegalArgumentException.class, () -> new PerformanceDemands(-1, null, 0));
+        assertThrows(IllegalArgumentException.class, () -> new PerformanceDemands(0, null, -1));
+
+        assertThrows(IllegalArgumentException.class, () -> new Sampler(null, "", -1, null));
+
+        // Test no image ID duplicates
+        assertThrows(IllegalArgumentException.class, () -> {
+            Image image1 = new Image("id", "id", 1, false, 1, null);
+            Image image2 = new Image("id", "id", 1, false, 1, null);
+            List<Image> imageList = new ArrayList<>();
+            imageList.add(image1);
+            imageList.add(image2);
+            new Configuration("azure", imageList, null, null);
+        });
     }
 }
