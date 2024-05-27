@@ -1,0 +1,37 @@
+{
+  "platform": "azure",
+  "images": [
+    {
+      "id": "presentation-tier",
+      "containerId": "test/presentation-tier",
+      "port": 8080,
+      "isTestEndpoint": true,
+      "minNumInstances": 2,
+      "env": {
+        "LOGICAL_ENDPOINT": "{test/logical-tier}"
+      }
+    }
+  ],
+  "tests": {
+    "healthCheckUrl": "/v1/ping",
+    "ordered": true,
+    "samplers": [
+      {
+        "method": "GET",
+        "path": "/v1/policies/testid",
+        "percentage": 34.6
+      },
+      {
+        "method": "PUT",
+        "path": "/v1/users",
+        "percentage": 65.4,
+        "requestBody": "{\"someProperty\": true}"
+      }
+    ]
+  },
+  "performance": {
+    "throughput": 10000,
+    "throughputTimeUnit": "MINUTE",
+    "latency": 50
+  }
+}
