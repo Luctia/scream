@@ -19,8 +19,9 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
 
     public String toXML(PerformanceDemands performanceDemands) {
         StringBuilder samplerString = new StringBuilder();
-        for (Sampler sampler : samplers) {
-            samplerString.append(sampler.toXML((int) ((performanceDemands.throughput() * sampler.percentage() / 100) / 60), performanceDemands.latency()));
+        for (int i = 0; i < samplers().size(); i++) {
+            Sampler sampler = samplers().get(i);
+            samplerString.append(sampler.toXML((int) ((performanceDemands.throughput() * sampler.percentage() / 100) / 60), i));
             samplerString.append("<hashTree/>\n</hashTree>\n");
         }
         return String.format("""
@@ -76,7 +77,6 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
                 </ConstantTimer>
                 <hashTree/>
                 </hashTree>
-                <hashTree/>
                 </hashTree>
                 """;
         // TODO determine protocol

@@ -16,11 +16,10 @@ public record Sampler(method method, String path, double percentage, String requ
 
     public Sampler {
         Objects.requireNonNull(path, "path cannot be null");
-        Objects.requireNonNull(percentage, "percentage cannot be null");
         if (percentage < 0) {throw new IllegalArgumentException("Percentage cannot be negative");}
     }
 
-    public String toXML(int maxRPS, int maxResponseTime) {
+    public String toXML(int maxRPS, int index) {
         // TODO resolve domain; what to do here?
         String domain = "localhost";
         String bodySection;
@@ -37,23 +36,19 @@ public record Sampler(method method, String path, double percentage, String requ
         } else {
             bodySection = "<collectionProp name=\"Arguments.arguments\"/>";
         }
+        String tstIdentifier = this.method + "_" + this.path.replaceAll("/", "") + "_" + index;
         return String.format("""
-                <kg.apc.jmeter.threads.UltimateThreadGroup guiclass="kg.apc.jmeter.threads.UltimateThreadGroupGui" testclass="kg.apc.jmeter.threads.UltimateThreadGroup" testname="jp@gc - Ultimate Thread Group">
-                <collectionProp name="ultimatethreadgroupdata">
-                <collectionProp name="488096577">
-                <stringProp name="55">%d</stringProp>
-                <stringProp name="0">0</stringProp>
-                <stringProp name="48">0</stringProp>
-                <stringProp name="1753">70</stringProp>
-                <stringProp name="53">10</stringProp>
-                </collectionProp>
-                </collectionProp>
-                <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
-                <intProp name="LoopController.loops">-1</intProp>
-                <boolProp name="LoopController.continue_forever">false</boolProp>
-                </elementProp>
+                <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
+                <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-                </kg.apc.jmeter.threads.UltimateThreadGroup>
+                <stringProp name="TargetLevel">${__tstFeedback(%s,%d,%d,%d)}</stringProp>
+                <stringProp name="RampUp"></stringProp>
+                <stringProp name="Steps"></stringProp>
+                <stringProp name="Hold">35</stringProp>
+                <stringProp name="LogFilename"></stringProp>
+                <stringProp name="Iterations"></stringProp>
+                <stringProp name="Unit">M</stringProp>
+                </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
                 <hashTree>
                 %s
                 <hashTree/>
@@ -70,9 +65,16 @@ public record Sampler(method method, String path, double percentage, String requ
                 </elementProp>
                 </HTTPSamplerProxy>
                 """,
-                Math.ceilDiv(maxRPS * maxResponseTime, 833),
-                generateVariableThroughputTimer(maxRPS),
-                method.toString() + " " + path,
+                // Throughput shaping timer name
+                tstIdentifier,
+                // Starting threads
+                10,
+                // Maximum threads
+                maxRPS / 2,
+                // Spare threads
+                maxRPS / 100,
+                generateVariableThroughputTimer(maxRPS, tstIdentifier),
+                method + " " + path,
                 domain,
                 // TODO choose between http and https
                 "http",
@@ -84,8 +86,9 @@ public record Sampler(method method, String path, double percentage, String requ
         );
     }
 
-    private String generateVariableThroughputTimer(int maxRPS) {
-        StringBuilder out = new StringBuilder("<kg.apc.jmeter.timers.VariableThroughputTimer guiclass=\"kg.apc.jmeter.timers.VariableThroughputTimerGui\" testclass=\"kg.apc.jmeter.timers.VariableThroughputTimer\" testname=\"jp@gc - Throughput Shaping Timer\">\n<collectionProp name=\"load_profile\">\n");
+    private String generateVariableThroughputTimer(int maxRPS, String identifier) {
+        String firstLine = String.format("<kg.apc.jmeter.timers.VariableThroughputTimer guiclass=\"kg.apc.jmeter.timers.VariableThroughputTimerGui\" testclass=\"kg.apc.jmeter.timers.VariableThroughputTimer\" testname=\"%s\">\n<collectionProp name=\"load_profile\">\n", identifier);
+        StringBuilder out = new StringBuilder(firstLine);
         int stepDuration = Math.ceilDiv(TEST_DURATION, 20);
         int stepIncrease = Math.ceilDiv(maxRPS, 10);
         int requests = 1;

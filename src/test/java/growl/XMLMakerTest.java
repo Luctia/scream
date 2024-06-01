@@ -117,24 +117,19 @@ public class XMLMakerTest {
 
         String expectedXML = """
                 <hashTree>
-                <kg.apc.jmeter.threads.UltimateThreadGroup guiclass="kg.apc.jmeter.threads.UltimateThreadGroupGui" testclass="kg.apc.jmeter.threads.UltimateThreadGroup" testname="jp@gc - Ultimate Thread Group">
-                <collectionProp name="ultimatethreadgroupdata">
-                <collectionProp name="488096577">
-                <stringProp name="55">4</stringProp>
-                <stringProp name="0">0</stringProp>
-                <stringProp name="48">0</stringProp>
-                <stringProp name="1753">70</stringProp>
-                <stringProp name="53">10</stringProp>
-                </collectionProp>
-                </collectionProp>
-                <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
-                <intProp name="LoopController.loops">-1</intProp>
-                <boolProp name="LoopController.continue_forever">false</boolProp>
-                </elementProp>
+                <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
+                <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-                </kg.apc.jmeter.threads.UltimateThreadGroup>
+                <stringProp name="TargetLevel">${__tstFeedback(GET_endpoint_0,10,28,0)}</stringProp>
+                <stringProp name="RampUp"></stringProp>
+                <stringProp name="Steps"></stringProp>
+                <stringProp name="Hold">35</stringProp>
+                <stringProp name="LogFilename"></stringProp>
+                <stringProp name="Iterations"></stringProp>
+                <stringProp name="Unit">M</stringProp>
+                </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
                 <hashTree>
-                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="jp@gc - Throughput Shaping Timer">
+                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_endpoint_0">
                 <collectionProp name="load_profile">
                 <collectionProp name="1">
                 <stringProp name="1">1</stringProp>
@@ -253,24 +248,19 @@ public class XMLMakerTest {
                 </HTTPSamplerProxy>
                 <hashTree/>
                 </hashTree>
-                <kg.apc.jmeter.threads.UltimateThreadGroup guiclass="kg.apc.jmeter.threads.UltimateThreadGroupGui" testclass="kg.apc.jmeter.threads.UltimateThreadGroup" testname="jp@gc - Ultimate Thread Group">
-                <collectionProp name="ultimatethreadgroupdata">
-                <collectionProp name="488096577">
-                <stringProp name="55">4</stringProp>
-                <stringProp name="0">0</stringProp>
-                <stringProp name="48">0</stringProp>
-                <stringProp name="1753">70</stringProp>
-                <stringProp name="53">10</stringProp>
-                </collectionProp>
-                </collectionProp>
-                <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
-                <intProp name="LoopController.loops">-1</intProp>
-                <boolProp name="LoopController.continue_forever">false</boolProp>
-                </elementProp>
+                <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
+                <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-                </kg.apc.jmeter.threads.UltimateThreadGroup>
+                <stringProp name="TargetLevel">${__tstFeedback(GET_endpointspec_1,10,28,0)}</stringProp>
+                <stringProp name="RampUp"></stringProp>
+                <stringProp name="Steps"></stringProp>
+                <stringProp name="Hold">35</stringProp>
+                <stringProp name="LogFilename"></stringProp>
+                <stringProp name="Iterations"></stringProp>
+                <stringProp name="Unit">M</stringProp>
+                </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
                 <hashTree>
-                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="jp@gc - Throughput Shaping Timer">
+                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_endpointspec_1">
                 <collectionProp name="load_profile">
                 <collectionProp name="1">
                 <stringProp name="1">1</stringProp>
@@ -486,6 +476,24 @@ public class XMLMakerTest {
         String expectedOutput = "";
         try {
             expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/orderedWithHealthCheckAndRampUp.jmx"));
+        } catch (IOException e) {
+            fail("File containing expected output not found");
+        }
+        assert config != null;
+        // When asserting, we need to remove some prettifying and double newlines. These do not change the validity or
+        //  functionality of the file.
+        assertEquals(
+                expectedOutput.replaceAll("\n *", "\n"),
+                XMLMaker.createTestplanXML(config, false).replaceAll("\n\n", "\n")
+        );
+    }
+
+    @Test
+    void Should_Properly_Construct_XML_Ordered_Without_Health() {
+        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/orderedWithoutHealth.json");
+        String expectedOutput = "";
+        try {
+            expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/orderedWithoutHealth.jmx"));
         } catch (IOException e) {
             fail("File containing expected output not found");
         }
