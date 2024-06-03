@@ -16,98 +16,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class XMLMakerTest {
-//    @Test
-//    void Should_Represent_Sampler() {
-//        Sampler sampler = new Sampler(Sampler.method.POST, "/endpoint", 50, "{\"id\": 3}");
-//        String resultingXML = sampler.toXML(10, 10);
-//        String expectedXML = """
-//                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST /endpoint">
-//                <stringProp name="HTTPSampler.domain">localhost</stringProp>
-//                <stringProp name="HTTPSampler.protocol">http</stringProp>
-//                <stringProp name="HTTPSampler.path">/endpoint</stringProp>
-//                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-//                <stringProp name="HTTPSampler.method">POST</stringProp>
-//                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-//                <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-//                <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-//                <collectionProp name="Arguments.arguments">
-//                <elementProp name="" elementType="HTTPArgument">
-//                <boolProp name="HTTPArgument.always_encode">false</boolProp>
-//                <stringProp name="Argument.value">{&quot;id&quot;: 3}</stringProp>
-//                <stringProp name="Argument.metadata">=</stringProp>
-//                </elementProp>
-//                </collectionProp>
-//
-//                </elementProp>
-//                </HTTPSamplerProxy>
-//                """;
-//        assertEquals(expectedXML, resultingXML);
-//    }
-
-//    @Test
-//    void Should_Represent_Multiple_Samplers_In_TestSpec() {
-//        List<Sampler> samplerList = new ArrayList<>();
-//        samplerList.add(new Sampler(
-//                Sampler.method.GET,
-//                "/endpoint",
-//                34.5,
-//                null)
-//        );
-//        samplerList.add(new Sampler(
-//                Sampler.method.GET,
-//                "/endpoint/spec",
-//                34.5,
-//                null)
-//        );
-//        TestSpecs testSpecs = new TestSpecs(null, false, samplerList);
-//        PerformanceDemands performanceDemands = new PerformanceDemands(10000, PerformanceDemands.TimeUnit.MINUTE, 50);
-//
-//        String expectedXML = """
-//                <hashTree>
-//
-//                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /endpoint">
-//                <stringProp name="HTTPSampler.domain">localhost</stringProp>
-//                <stringProp name="HTTPSampler.protocol">http</stringProp>
-//                <stringProp name="HTTPSampler.path">/endpoint</stringProp>
-//                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-//                <stringProp name="HTTPSampler.method">GET</stringProp>
-//                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-//                <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-//                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-//                <collectionProp name="Arguments.arguments"/>
-//                </elementProp>
-//                </HTTPSamplerProxy>
-//                <hashTree/>
-//                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /endpoint/spec">
-//                <stringProp name="HTTPSampler.domain">localhost</stringProp>
-//                <stringProp name="HTTPSampler.protocol">http</stringProp>
-//                <stringProp name="HTTPSampler.path">/endpoint/spec</stringProp>
-//                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-//                <stringProp name="HTTPSampler.method">GET</stringProp>
-//                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-//                <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-//                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-//                <collectionProp name="Arguments.arguments"/>
-//                </elementProp>
-//                </HTTPSamplerProxy>
-//                <hashTree/>
-//
-//                </hashTree>
-//                """;
-//        assertEquals(expectedXML, testSpecs.toXML(performanceDemands));
-//    }
 
     @Test
     void Should_Represent_Multiple_Ordered_Samplers_In_TestSpec_Without_Healthcheck() {
         List<Sampler> samplerList = new ArrayList<>();
         samplerList.add(new Sampler(
                 Sampler.method.GET,
+                "presentation-tier",
                 "/endpoint",
                 34.5,
                 null)
         );
         samplerList.add(new Sampler(
                 Sampler.method.GET,
+                "presentation-tier",
                 "/endpoint/spec",
                 34.5,
                 null)
@@ -120,7 +42,7 @@ public class XMLMakerTest {
                 <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
                 <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-                <stringProp name="TargetLevel">${__tstFeedback(GET_endpoint_0,10,28,0)}</stringProp>
+                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierendpoint_0,10,28,0)}</stringProp>
                 <stringProp name="RampUp"></stringProp>
                 <stringProp name="Steps"></stringProp>
                 <stringProp name="Hold">35</stringProp>
@@ -129,7 +51,7 @@ public class XMLMakerTest {
                 <stringProp name="Unit">M</stringProp>
                 </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
                 <hashTree>
-                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_endpoint_0">
+                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tierendpoint_0">
                 <collectionProp name="load_profile">
                 <collectionProp name="1">
                 <stringProp name="1">1</stringProp>
@@ -234,8 +156,8 @@ public class XMLMakerTest {
                 </collectionProp>
                 </kg.apc.jmeter.timers.VariableThroughputTimer>
                 <hashTree/>
-                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /endpoint" enabled="true">
-                <stringProp name="HTTPSampler.domain">localhost</stringProp>
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET presentation-tier/endpoint" enabled="true">
+                <stringProp name="HTTPSampler.domain">presentation-tier</stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
                 <stringProp name="HTTPSampler.path">/endpoint</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
@@ -251,7 +173,7 @@ public class XMLMakerTest {
                 <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
                 <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-                <stringProp name="TargetLevel">${__tstFeedback(GET_endpointspec_1,10,28,0)}</stringProp>
+                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierendpointspec_1,10,28,0)}</stringProp>
                 <stringProp name="RampUp"></stringProp>
                 <stringProp name="Steps"></stringProp>
                 <stringProp name="Hold">35</stringProp>
@@ -260,7 +182,7 @@ public class XMLMakerTest {
                 <stringProp name="Unit">M</stringProp>
                 </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
                 <hashTree>
-                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_endpointspec_1">
+                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tierendpointspec_1">
                 <collectionProp name="load_profile">
                 <collectionProp name="1">
                 <stringProp name="1">1</stringProp>
@@ -365,8 +287,8 @@ public class XMLMakerTest {
                 </collectionProp>
                 </kg.apc.jmeter.timers.VariableThroughputTimer>
                 <hashTree/>
-                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /endpoint/spec" enabled="true">
-                <stringProp name="HTTPSampler.domain">localhost</stringProp>
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET presentation-tier/endpoint/spec" enabled="true">
+                <stringProp name="HTTPSampler.domain">presentation-tier</stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
                 <stringProp name="HTTPSampler.path">/endpoint/spec</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
@@ -383,92 +305,6 @@ public class XMLMakerTest {
                 """;
         assertEquals(expectedXML, testSpecs.toXML(performanceDemands).replaceAll("\n\n", "\n"));
     }
-
-//    @Test
-//    void Should_Represent_Multiple_Ordered_Samplers_In_TestSpec_With_Healthcheck() {
-//        List<Sampler> samplerList = new ArrayList<>();
-//        samplerList.add(new Sampler(
-//                Sampler.method.GET,
-//                "/endpoint",
-//                34.5,
-//                null)
-//        );
-//        samplerList.add(new Sampler(
-//                Sampler.method.GET,
-//                "/endpoint/spec",
-//                34.5,
-//                null)
-//        );
-//        TestSpecs testSpecs = new TestSpecs("/v1/ping", true, samplerList);
-//        PerformanceDemands performanceDemands = new PerformanceDemands(10000, PerformanceDemands.TimeUnit.MINUTE, 50);
-//
-//        String expectedXML = """
-//                <hashTree>
-//                <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="Wait for health check">
-//                <stringProp name="WhileController.condition">${__jexl3(&quot;${responseCode}&quot; != 200,)}</stringProp>
-//                </WhileController>
-//                <hashTree>
-//                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Health check">
-//                <stringProp name="HTTPSampler.domain">/v1/ping</stringProp>
-//                <stringProp name="HTTPSampler.protocol">http</stringProp>
-//                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-//                <stringProp name="HTTPSampler.method">GET</stringProp>
-//                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-//                <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-//                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-//                <collectionProp name="Arguments.arguments"/>
-//                </elementProp>
-//                </HTTPSamplerProxy>
-//                <hashTree>
-//                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor">
-//                <stringProp name="RegexExtractor.useHeaders">code</stringProp>
-//                <stringProp name="RegexExtractor.refname">responseCode</stringProp>
-//                <stringProp name="RegexExtractor.regex">(.*)</stringProp>
-//                <stringProp name="RegexExtractor.template">$1$</stringProp>
-//                <stringProp name="RegexExtractor.default"></stringProp>
-//                <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
-//                <stringProp name="RegexExtractor.match_number"></stringProp>
-//                </RegexExtractor>
-//                <hashTree/>
-//                </hashTree>
-//                <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer">
-//                <stringProp name="ConstantTimer.delay">1000</stringProp>
-//                </ConstantTimer>
-//                <hashTree/>
-//                </hashTree>
-//                <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Ordered test"/>
-//                <hashTree>
-//                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /endpoint">
-//                <stringProp name="HTTPSampler.domain">localhost</stringProp>
-//                <stringProp name="HTTPSampler.protocol">http</stringProp>
-//                <stringProp name="HTTPSampler.path">/endpoint</stringProp>
-//                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-//                <stringProp name="HTTPSampler.method">GET</stringProp>
-//                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-//                <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-//                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-//                <collectionProp name="Arguments.arguments"/>
-//                </elementProp>
-//                </HTTPSamplerProxy>
-//                <hashTree/>
-//                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /endpoint/spec">
-//                <stringProp name="HTTPSampler.domain">localhost</stringProp>
-//                <stringProp name="HTTPSampler.protocol">http</stringProp>
-//                <stringProp name="HTTPSampler.path">/endpoint/spec</stringProp>
-//                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-//                <stringProp name="HTTPSampler.method">GET</stringProp>
-//                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-//                <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-//                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-//                <collectionProp name="Arguments.arguments"/>
-//                </elementProp>
-//                </HTTPSamplerProxy>
-//                <hashTree/>
-//                </hashTree>
-//                </hashTree>
-//                """;
-//        assertEquals(expectedXML, testSpecs.toXML(performanceDemands).replaceAll("\n\n", "\n"));
-//    }
 
     @Test
     void Should_Represent_Ordered_With_Health_Check() {

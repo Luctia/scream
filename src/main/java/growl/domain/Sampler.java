@@ -5,11 +5,12 @@ import java.util.Objects;
 /**
  * Record to represent samplers for benchmarking.
  * @param method HTTP method to use. Defaults to GET
+ * @param targetId ID of the target container/service
  * @param path path to send request to. Required
  * @param percentage percentage of total load taken by this path. Required
  * @param requestBody body to send with the request
  */
-public record Sampler(method method, String path, double percentage, String requestBody) {
+public record Sampler(method method, String targetId, String path, double percentage, String requestBody) {
     public enum method { GET, POST, PUT, DELETE }
     /** The duration of a benchmark. The steps in the throughput shaper will be evenly spaced out in this timeframe. */
     private static final int TEST_DURATION = 60;
@@ -20,8 +21,6 @@ public record Sampler(method method, String path, double percentage, String requ
     }
 
     public String toXML(int maxRPS, int index) {
-        // TODO resolve domain; what to do here?
-        String domain = "localhost";
         String bodySection;
         if (requestBody != null) {
             bodySection = String.format("""
@@ -36,7 +35,7 @@ public record Sampler(method method, String path, double percentage, String requ
         } else {
             bodySection = "<collectionProp name=\"Arguments.arguments\"/>";
         }
-        String tstIdentifier = this.method + "_" + this.path.replaceAll("/", "") + "_" + index;
+        String tstIdentifier = this.method + "_" + targetId + this.path.replaceAll("/", "") + "_" + index;
         return String.format("""
                 <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
                 <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
@@ -74,8 +73,8 @@ public record Sampler(method method, String path, double percentage, String requ
                 // Spare threads
                 maxRPS / 100,
                 generateVariableThroughputTimer(maxRPS, tstIdentifier),
-                method + " " + path,
-                domain,
+                method + " " + targetId + path,
+                targetId,
                 // TODO choose between http and https
                 "http",
                 path,

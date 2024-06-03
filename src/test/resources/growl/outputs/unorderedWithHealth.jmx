@@ -55,7 +55,7 @@
       <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
         <elementProp elementType="com.blazemeter.jmeter.control.VirtualUserController" name="ThreadGroup.main_controller"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">${__tstFeedback(GET_v1policiestestid_0,10,200,4)}</stringProp>
+        <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierv1policiestestid_0,10,200,4)}</stringProp>
         <stringProp name="RampUp"/>
         <stringProp name="Steps"/>
         <stringProp name="Hold">35</stringProp>
@@ -64,7 +64,7 @@
         <stringProp name="Unit">M</stringProp>
       </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
       <hashTree>
-        <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_v1policiestestid_0">
+        <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tierv1policiestestid_0">
           <collectionProp name="load_profile">
             <collectionProp name="1">
               <stringProp name="1">1</stringProp>
@@ -169,8 +169,8 @@
           </collectionProp>
         </kg.apc.jmeter.timers.VariableThroughputTimer>
         <hashTree/>
-        <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /v1/policies/testid">
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+        <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET presentation-tier/v1/policies/testid">
+          <stringProp name="HTTPSampler.domain">presentation-tier</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.path">/v1/policies/testid</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>

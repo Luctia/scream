@@ -116,7 +116,7 @@ public class ConfigurationMakerTest {
         assertThrows(NullPointerException.class, () -> new Configuration(null, new ArrayList<>(), null, null));
         assertThrows(NullPointerException.class, () -> new Image(null, null, 0, false, 0, null));
         assertThrows(NullPointerException.class, () -> new TestSpecs(null, false, null));
-        assertThrows(NullPointerException.class, () -> new Sampler(null, null, 0, null));
+        assertThrows(NullPointerException.class, () -> new Sampler(null, null, null, 0, null));
 
         // Test lists not being empty
         assertThrows(IllegalArgumentException.class, () -> new Configuration("azure", new ArrayList<>(), null, null));
@@ -133,7 +133,7 @@ public class ConfigurationMakerTest {
         assertThrows(IllegalArgumentException.class, () -> new PerformanceDemands(-1, null, 0));
         assertThrows(IllegalArgumentException.class, () -> new PerformanceDemands(0, null, -1));
 
-        assertThrows(IllegalArgumentException.class, () -> new Sampler(null, "", -1, null));
+        assertThrows(IllegalArgumentException.class, () -> new Sampler(null, null, "", -1, null));
 
         // Test no image ID duplicates
         assertThrows(IllegalArgumentException.class, () -> {
