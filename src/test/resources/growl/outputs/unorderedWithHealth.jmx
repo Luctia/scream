@@ -55,7 +55,7 @@
       <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
         <elementProp elementType="com.blazemeter.jmeter.control.VirtualUserController" name="ThreadGroup.main_controller"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierv1policiestestid_0,10,200,4)}</stringProp>
+        <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierv1policiestestid_0,20,200,4)}</stringProp>
         <stringProp name="RampUp"/>
         <stringProp name="Steps"/>
         <stringProp name="Hold">35</stringProp>

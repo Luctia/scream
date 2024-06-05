@@ -42,7 +42,7 @@ public class XMLMakerTest {
                 <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
                 <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierendpoint_0,10,28,0)}</stringProp>
+                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierendpoint_0,2,28,0)}</stringProp>
                 <stringProp name="RampUp"></stringProp>
                 <stringProp name="Steps"></stringProp>
                 <stringProp name="Hold">35</stringProp>
@@ -173,7 +173,7 @@ public class XMLMakerTest {
                 <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
                 <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierendpointspec_1,10,28,0)}</stringProp>
+                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierendpointspec_1,2,28,0)}</stringProp>
                 <stringProp name="RampUp"></stringProp>
                 <stringProp name="Steps"></stringProp>
                 <stringProp name="Hold">35</stringProp>

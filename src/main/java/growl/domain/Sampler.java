@@ -20,7 +20,7 @@ public record Sampler(method method, String targetId, String path, double percen
         if (percentage < 0) {throw new IllegalArgumentException("Percentage cannot be negative");}
     }
 
-    public String toXML(int maxRPS, int index) {
+    public String toXML(int maxRPS, int MRT, int index) {
         String bodySection;
         if (requestBody != null) {
             bodySection = String.format("""
@@ -67,7 +67,7 @@ public record Sampler(method method, String targetId, String path, double percen
                 // Throughput shaping timer name
                 tstIdentifier,
                 // Starting threads
-                10,
+                (maxRPS * MRT) / 1000,
                 // Maximum threads
                 maxRPS / 2,
                 // Spare threads

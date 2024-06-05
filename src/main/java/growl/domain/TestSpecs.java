@@ -21,7 +21,7 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
         StringBuilder samplerString = new StringBuilder();
         for (int i = 0; i < samplers().size(); i++) {
             Sampler sampler = samplers().get(i);
-            samplerString.append(sampler.toXML((int) ((performanceDemands.throughput() * sampler.percentage() / 100) / 60), i));
+            samplerString.append(sampler.toXML((int) ((performanceDemands.throughput() * sampler.percentage() / 100) / 60), performanceDemands.latency(), i));
             samplerString.append("<hashTree/>\n</hashTree>\n");
         }
         return String.format("""
