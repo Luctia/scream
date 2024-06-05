@@ -5,10 +5,11 @@ import java.util.Objects;
 
 /**
  * Record for representing global test specifications.
+ *
  * @param healthCheckUrl URL that, when requested, should return 200 OK before commencing with tests/benchmarks. Not
  *                       required
- * @param ordered whether to execute all tests in the sequence they were given. Defaults to false
- * @param samplers list of samplers. Required and should not be empty
+ * @param ordered        whether to execute all tests in the sequence they were given. Defaults to false
+ * @param samplers       list of samplers. Required and should not be empty
  */
 public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> samplers) {
     public TestSpecs {
@@ -16,39 +17,39 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
         if (samplers.isEmpty()) throw new IllegalArgumentException("samplers may not be empty");
     }
 
-    public String toXML() {
+    public String toXML(PerformanceDemands performanceDemands) {
         StringBuilder samplerString = new StringBuilder();
-        for (Sampler sampler : samplers) {
-            samplerString.append(sampler.toXML());
-            samplerString.append("<hashTree/>\n");
+        for (int i = 0; i < samplers().size(); i++) {
+            Sampler sampler = samplers().get(i);
+            samplerString.append(sampler.toXML((int) ((performanceDemands.throughput() * sampler.percentage() / 100) / 60), performanceDemands.latency(), i));
+            samplerString.append("<hashTree/>\n</hashTree>\n");
         }
-        if (ordered) {
-            return String.format("""
-                             <hashTree>
-                             %s
-                             <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Ordered test"/>
-                             <hashTree>
-                             %s
-                             </hashTree>
-                             </hashTree>
-                             """, healthCheckUrl == null ? "" : healthCheckConfig(), samplerString);
-        } else {
-            return String.format("""
-                             <hashTree>
-                             %s
-                             %s
-                             </hashTree>
-                             """, healthCheckUrl == null ? "" : healthCheckConfig(), samplerString);
-        }
+        return String.format("""
+                <hashTree>
+                %s
+                %s
+                </hashTree>
+                """, healthCheckUrl == null ? "" : healthCheckConfig(), samplerString);
     }
 
     private String healthCheckConfig() {
         String base = """
-                <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="Wait for health check">
+                <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Health check thread group">
+                <intProp name="ThreadGroup.num_threads">1</intProp>
+                <intProp name="ThreadGroup.ramp_time">1</intProp>
+                <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+                <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+                <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+                <stringProp name="LoopController.loops">1</stringProp>
+                <boolProp name="LoopController.continue_forever">false</boolProp>
+                </elementProp>
+                </ThreadGroup>
+                <hashTree>
+                <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="Wait for health check to succeed" enabled="true">
                 <stringProp name="WhileController.condition">${__jexl3(&quot;${responseCode}&quot; != 200,)}</stringProp>
                 </WhileController>
                 <hashTree>
-                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Health check">
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Health check" enabled="true">
                 <stringProp name="HTTPSampler.domain">%s</stringProp>
                 <stringProp name="HTTPSampler.protocol">%s</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
@@ -60,7 +61,7 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
                 </elementProp>
                 </HTTPSamplerProxy>
                 <hashTree>
-                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor">
+                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="true">
                 <stringProp name="RegexExtractor.useHeaders">code</stringProp>
                 <stringProp name="RegexExtractor.refname">responseCode</stringProp>
                 <stringProp name="RegexExtractor.regex">(.*)</stringProp>
@@ -71,10 +72,11 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
                 </RegexExtractor>
                 <hashTree/>
                 </hashTree>
-                <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer">
+                <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
                 <stringProp name="ConstantTimer.delay">1000</stringProp>
                 </ConstantTimer>
                 <hashTree/>
+                </hashTree>
                 </hashTree>
                 """;
         // TODO determine protocol

@@ -18,6 +18,7 @@
     "samplers": [
       {
         "method": "GET",
+        "targetId": "presentation-tier",
         "path": "/v1/policies/testid",
         "percentage": 99.9,
         "requestBody": "{\"someProperty\": true}"

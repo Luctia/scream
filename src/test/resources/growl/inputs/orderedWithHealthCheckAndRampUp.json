@@ -13,19 +13,26 @@
     }
   ],
   "tests": {
-    "ordered": false,
+    "healthCheckUrl": "/v1/ping",
+    "ordered": true,
     "samplers": [
       {
         "method": "GET",
         "targetId": "presentation-tier",
         "path": "/v1/policies/testid",
-        "percentage": 99.9,
+        "percentage": 34.6
+      },
+      {
+        "method": "PUT",
+        "targetId": "presentation-tier",
+        "path": "/v1/users",
+        "percentage": 65.4,
         "requestBody": "{\"someProperty\": true}"
       }
     ]
   },
   "performance": {
-    "throughput": 24050,
+    "throughput": 10000,
     "throughputTimeUnit": "MINUTE",
     "latency": 50
   }
