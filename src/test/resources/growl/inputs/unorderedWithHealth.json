@@ -2,7 +2,7 @@
   "platform": "azure",
   "images": [
     {
-      "id": "presentation-tier",
+      "imageId": "presentation-tier",
       "containerId": "test/presentation-tier",
       "port": 8080,
       "isTestEndpoint": true,

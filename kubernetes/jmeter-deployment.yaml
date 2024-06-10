@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: jmeter
+  name: jmeter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: jmeter
+  template:
+    metadata:
+      labels:
+        io.kompose.service: jmeter
+    spec:
+      initContainers:
+        - image: jmetertest
+          name: jmetertest
+          imagePullPolicy: Never
+          command: [ "./bin/jmeter", "-n", "-t", "config.jmx" ]
+          restartPolicy: OnFailure
+          ports:
+            - containerPort: 80
+              protocol: TCP
+      containers: []
+      restartPolicy: Always

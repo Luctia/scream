@@ -18,7 +18,7 @@ public record Configuration(String platform, List<Image> images, TestSpecs tests
         Objects.requireNonNull(images, "images cannot be null");
         if (images.isEmpty()) throw new IllegalArgumentException("images should not be empty");
 
-        Set<String> imageIds = images.stream().map(Image::id).collect(Collectors.toSet());
+        Set<String> imageIds = images.stream().map(Image::imageId).collect(Collectors.toSet());
         if (imageIds.size() != images.size()) throw new IllegalArgumentException("Duplicate image IDs");
 
         Objects.requireNonNull(tests, "tests cannot be null");

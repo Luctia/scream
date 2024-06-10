@@ -14,7 +14,7 @@ public class ConfigurationMakerTest {
         Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/unorderedWithHealth.json");
         assertNotNull(config);
         assertEquals("azure", config.platform());
-        assertEquals("presentation-tier", config.images().getFirst().id());
+        assertEquals("presentation-tier", config.images().getFirst().imageId());
 
         assertEquals(1, config.images().size());
         assertEquals("test/presentation-tier", config.images().getFirst().containerId());
@@ -45,7 +45,7 @@ public class ConfigurationMakerTest {
                   "platform": "azure",
                   "images": [
                     {
-                      "id": "presentation-tier",
+                      "imageId": "presentation-tier",
                       "containerId": "test/presentation-tier",
                       "port": 8080,
                       "isTestEndpoint": true,
@@ -76,7 +76,7 @@ public class ConfigurationMakerTest {
                 """;
         Configuration config = ConfigurationMaker.makeConfiguration(json);
         assertEquals("azure", config.platform());
-        assertEquals("presentation-tier", config.images().getFirst().id());
+        assertEquals("presentation-tier", config.images().getFirst().imageId());
 
         assertEquals(1, config.images().size());
         assertEquals("test/presentation-tier", config.images().getFirst().containerId());

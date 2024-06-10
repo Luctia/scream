@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: nginx
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: nginx
+  template:
+    metadata:
+      labels:
+        io.kompose.service: nginx
+    spec:
+      containers:
+        - image: nginxdemos/hello
+          name: nginx
+          ports:
+            - containerPort: 80
+              protocol: TCP
+      restartPolicy: Always

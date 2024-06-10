@@ -1,0 +1,28 @@
+{
+  "platform": "azure",
+  "images": [
+    {
+      "imageId": "nginxdemos/hello",
+      "containerId": "nginx",
+      "port": 80,
+      "isTestEndpoint": true,
+      "minNumInstances": 1
+    }
+  ],
+  "tests": {
+    "ordered": false,
+    "samplers": [
+      {
+        "method": "GET",
+        "targetId": "nginx",
+        "path": "/test",
+        "percentage": 100
+      }
+    ]
+  },
+  "performance": {
+    "throughput": 6000,
+    "throughputTimeUnit": "MINUTE",
+    "latency": 100
+  }
+}

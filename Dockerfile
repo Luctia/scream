@@ -17,5 +17,3 @@ RUN ./bin/PluginsManagerCMD.sh install jpgc-tst=2.6,jpgc-casutg=2.10
 
 # Copy config file into the container
 COPY config.jmx config.jmx
-
-CMD [ "./bin/jmeter", "-n", "-t", "config.jmx" ]
