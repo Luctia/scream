@@ -14,14 +14,12 @@ spec:
       labels:
         io.kompose.service: jmeter
     spec:
-      initContainers:
+      containers:
         - image: jmetertest
           name: jmetertest
           imagePullPolicy: Never
           command: [ "./bin/jmeter", "-n", "-t", "config.jmx" ]
-          restartPolicy: OnFailure
           ports:
             - containerPort: 80
               protocol: TCP
-      containers: []
       restartPolicy: Always
