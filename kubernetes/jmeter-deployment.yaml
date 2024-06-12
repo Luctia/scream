@@ -2,17 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.kompose.service: jmeter
+    scream.service: jmeter
   name: jmeter
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: jmeter
+      scream.service: jmeter
   template:
     metadata:
       labels:
-        io.kompose.service: jmeter
+        scream.service: jmeter
     spec:
       containers:
         - image: jmetertest
@@ -22,4 +22,3 @@ spec:
           ports:
             - containerPort: 80
               protocol: TCP
-      restartPolicy: Always
