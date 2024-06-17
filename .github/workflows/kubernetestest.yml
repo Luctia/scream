@@ -21,8 +21,12 @@ jobs:
       - name: Execute k8s-lint with valid kubeconform
         uses: ./
         with:
-          manifests: kubernetes/*
+          manifests:  |
+            kubernetes/*
+            kubernetes/nginx-service.yaml
       - name: Execute k8s-lint with valid dryrun
         uses: ./
         with:
-          manifests: kubernetes/*
+          manifests: |
+            kubernetes/*
+            kubernetes/nginx-service.yaml
