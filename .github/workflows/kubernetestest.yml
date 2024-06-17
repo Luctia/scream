@@ -18,15 +18,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v2.0
       - name: Execute k8s-lint with valid kubeconform
-        uses: ./
+        uses: azure/k8s-lint@v1
         with:
           manifests:  |
-            kubernetes/*
-            kubernetes/nginx-service.yaml
-      - name: Execute k8s-lint with valid dryrun
-        uses: ./
-        with:
-          manifests: |
             kubernetes/*
             kubernetes/nginx-service.yaml
