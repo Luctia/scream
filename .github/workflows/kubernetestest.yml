@@ -1,0 +1,29 @@
+name: Kubernetes verification
+
+permissions:
+  contents: read
+  checks: write
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    name: K8s lint and verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v2.0
+      - name: Execute k8s-lint with valid kubeconform
+        uses: azure/k8s-lint@v1
+        with:
+          manifests:  |
+            kubernetes/nginx-deployment.yaml
+            kubernetes/nginx-service.yaml
+            kubernetes/jmeter-deployment.yaml
+            kubernetes/jmeter-service.yaml
