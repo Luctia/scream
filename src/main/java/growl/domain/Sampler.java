@@ -10,8 +10,8 @@ import java.util.Objects;
  * @param percentage percentage of total load taken by this path. Required
  * @param requestBody body to send with the request
  */
-public record Sampler(method method, String targetId, String path, double percentage, String requestBody) {
-    public enum method { GET, POST, PUT, DELETE }
+public record Sampler(Method method, String targetId, String path, double percentage, String requestBody) {
+    public enum Method { GET, POST, PUT, DELETE }
     /** The duration of a benchmark. The steps in the throughput shaper will be evenly spaced out in this timeframe. */
     private static final int TEST_DURATION = 60;
 

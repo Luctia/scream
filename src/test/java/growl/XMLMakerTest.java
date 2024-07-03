@@ -21,14 +21,14 @@ public class XMLMakerTest {
     void Should_Represent_Multiple_Ordered_Samplers_In_TestSpec_Without_Healthcheck() {
         List<Sampler> samplerList = new ArrayList<>();
         samplerList.add(new Sampler(
-                Sampler.method.GET,
+                Sampler.Method.GET,
                 "presentation-tier",
                 "/endpoint",
                 34.5,
                 null)
         );
         samplerList.add(new Sampler(
-                Sampler.method.GET,
+                Sampler.Method.GET,
                 "presentation-tier",
                 "/endpoint/spec",
                 34.5,
