@@ -49,8 +49,8 @@ public class TestResult {
 
     public double getLastLatency() {
         // There are 20 phases in the test plan, and for this we only want to see the requests from the last phase.
-        //  Thus, we determine the starting time of that phase and filter out the requests with a timestamp from before
-        //  that time.
+        //  Thus, we determine the starting time of that phase (all phases last the same amount of time) and filter out
+        //  the requests with a timestamp from before that time.
         long totalTime = this.testResultLines.getLast().timeStamp - this.testResultLines.getFirst().timeStamp;
         long phaseDuration = totalTime / 20;
         long startingTime = this.testResultLines.getLast().timeStamp - phaseDuration;

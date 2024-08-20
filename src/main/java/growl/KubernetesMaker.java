@@ -2,9 +2,16 @@ package growl;
 
 import growl.domain.Configuration;
 import growl.domain.Image;
+import io.fabric8.kubernetes.api.model.IntOrString;
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServiceBuilder;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KubernetesMaker {
     private static final String JMETER_DEPLOYMENT_FILE = """
@@ -105,5 +112,105 @@ public class KubernetesMaker {
                 System.err.println("Could not create config.jmx file");
             }
         }
+    }
+
+    public static List<Deployment> generateDeployments(Configuration configuration) {
+        List<Deployment> deployments = new ArrayList<>();
+        for (Image image : configuration.images()) {
+            // @formatter:off
+            deployments.add(
+                    new DeploymentBuilder()
+                    .withNewMetadata()
+                        .withName(image.imageId())
+                        .addToLabels("scream.service", image.imageId())
+                    .endMetadata()
+                    .withNewSpec()
+                        .withReplicas(1)
+                        .withNewTemplate()
+                            .withNewMetadata()
+                                .addToLabels("scream.service", image.imageId())
+                            .endMetadata()
+                            .withNewSpec()
+                            .addNewContainer()
+                                .withName(image.imageId())
+                                .withImage(image.containerId())
+                                .withImagePullPolicy("Never")
+                                .addNewPort()
+                                    .withProtocol("TCP")
+                                    .withContainerPort(80)
+                                .endPort()
+                                .withRestartPolicy("Always")
+                            .endContainer()
+                        .endSpec()
+                    .endTemplate()
+                    .withNewSelector()
+                        .addToMatchLabels("scream.service", image.imageId())
+                    .endSelector()
+                    .endSpec()
+                    .build()
+            );
+            // @formatter:on
+        }
+        return deployments;
+    }
+
+    public static Deployment generateJMeterDeployment() {
+        // @formatter:off
+        return new DeploymentBuilder()
+                .withNewMetadata()
+                    .withName("jmeter")
+                    .addToLabels("scream.service", "jmeter")
+                .endMetadata()
+                .withNewSpec()
+                    .withReplicas(1)
+                    .withNewTemplate()
+                        .withNewMetadata()
+                            .addToLabels("scream.service", "jmeter")
+                        .endMetadata()
+                        .withNewSpec()
+                        .addNewContainer()
+                            .withName("jmeter")
+                            .withImage("jmetertest")
+                            .withImagePullPolicy("Never")
+                            .addNewPort()
+                                .withProtocol("TCP")
+                                .withContainerPort(80)
+                            .endPort()
+                            .withRestartPolicy("Always")
+                            .withCommand("./bin/jmeter", "-n", "-t", "config.jmx")
+                        .endContainer()
+                    .endSpec()
+                .endTemplate()
+                .withNewSelector()
+                    .addToMatchLabels("scream.service", "jmeter")
+                .endSelector()
+                .endSpec()
+                .build();
+        // @formatter:on
+    }
+
+    public static List<Service> generateServices(Configuration configuration) {
+        List<Service> services = new ArrayList<>();
+        for (Image image : configuration.images()) {
+            // @formatter:off
+            services.add(
+                    new ServiceBuilder()
+                            .withNewMetadata()
+                                .withName(image.imageId())
+                                .addToLabels("scream.service", image.imageId())
+                            .endMetadata()
+                            .withNewSpec()
+                                .addNewPort()
+                                    .withName("80")
+                                    .withTargetPort(new IntOrString(80))
+                                    .withPort(80)
+                                .endPort()
+                                .addToSelector("scream.service", image.imageId())
+                            .endSpec()
+                            .build()
+            );
+            // @formatter:on
+        }
+        return services;
     }
 }

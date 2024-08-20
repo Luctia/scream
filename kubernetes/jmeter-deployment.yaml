@@ -18,6 +18,7 @@ spec:
         - image: jmetertest
           name: jmetertest
           imagePullPolicy: Never
+          # TODO this is not right, start Java
           command: [ "./bin/jmeter", "-n", "-t", "config.jmx" ]
           ports:
             - containerPort: 80

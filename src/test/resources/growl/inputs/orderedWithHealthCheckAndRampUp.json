@@ -1,5 +1,5 @@
 {
-  "platform": "azure",
+  "namespace": "default",
   "images": [
     {
       "imageId": "presentation-tier",
@@ -34,6 +34,7 @@
   "performance": {
     "throughput": 10000,
     "throughputTimeUnit": "MINUTE",
-    "latency": 50
+    "latency": 50,
+    "failureRate": 0.01
   }
 }

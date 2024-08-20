@@ -38,7 +38,7 @@ public class XMLMaker {
      * Export the configuration as a JMeter-compatible Testplan XML file.
      * @param configuration the configuration to be used
      */
-    static void exportXML(Configuration configuration, boolean prettyPrint) {
+    public static void exportXML(Configuration configuration, boolean prettyPrint) {
         String xml = createTestplanXML(configuration, prettyPrint);
         try {
             PrintWriter writer = new PrintWriter("config.jmx");

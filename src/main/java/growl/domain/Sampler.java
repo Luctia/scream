@@ -35,7 +35,7 @@ public record Sampler(Method method, String targetId, String path, double percen
         } else {
             bodySection = "<collectionProp name=\"Arguments.arguments\"/>";
         }
-        String tstIdentifier = this.method + "_" + targetId + this.path.replaceAll("/", "") + "_" + index;
+        String tstIdentifier = this.method + "_" + targetId + "_" + this.path.replaceAll("/", "") + "_" + index;
         return String.format("""
                 <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
                 <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>

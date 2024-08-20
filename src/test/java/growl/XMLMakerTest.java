@@ -35,14 +35,14 @@ public class XMLMakerTest {
                 null)
         );
         TestSpecs testSpecs = new TestSpecs(null, true, samplerList);
-        PerformanceDemands performanceDemands = new PerformanceDemands(10000, PerformanceDemands.TimeUnit.MINUTE, 50);
+        PerformanceDemands performanceDemands = new PerformanceDemands(10000, PerformanceDemands.TimeUnit.MINUTE, 50, 0.01);
 
         String expectedXML = """
                 <hashTree>
                 <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
                 <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierendpoint_0,2,28,0)}</stringProp>
+                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tier_endpoint_0,2,28,0)}</stringProp>
                 <stringProp name="RampUp"></stringProp>
                 <stringProp name="Steps"></stringProp>
                 <stringProp name="Hold">35</stringProp>
@@ -51,7 +51,7 @@ public class XMLMakerTest {
                 <stringProp name="Unit">M</stringProp>
                 </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
                 <hashTree>
-                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tierendpoint_0">
+                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tier_endpoint_0">
                 <collectionProp name="load_profile">
                 <collectionProp name="1">
                 <stringProp name="1">1</stringProp>
@@ -203,14 +203,14 @@ public class XMLMakerTest {
                 <connectTime>true</connectTime>
                 </value>
                 </objProp>
-                <stringProp name="filename">GET_presentation-tierendpoint_0.csv</stringProp>
+                <stringProp name="filename">GET_presentation-tier_endpoint_0.csv</stringProp>
                 </ResultCollector>
                 <hashTree/>
                 </hashTree>
                 <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
                 <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierendpointspec_1,2,28,0)}</stringProp>
+                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tier_endpointspec_1,2,28,0)}</stringProp>
                 <stringProp name="RampUp"></stringProp>
                 <stringProp name="Steps"></stringProp>
                 <stringProp name="Hold">35</stringProp>
@@ -219,7 +219,7 @@ public class XMLMakerTest {
                 <stringProp name="Unit">M</stringProp>
                 </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
                 <hashTree>
-                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tierendpointspec_1">
+                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tier_endpointspec_1">
                 <collectionProp name="load_profile">
                 <collectionProp name="1">
                 <stringProp name="1">1</stringProp>
@@ -371,7 +371,7 @@ public class XMLMakerTest {
                 <connectTime>true</connectTime>
                 </value>
                 </objProp>
-                <stringProp name="filename">GET_presentation-tierendpointspec_1.csv</stringProp>
+                <stringProp name="filename">GET_presentation-tier_endpointspec_1.csv</stringProp>
                 </ResultCollector>
                 <hashTree/>
                 </hashTree>

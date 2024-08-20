@@ -1,5 +1,5 @@
 {
-  "platform": "azure",
+  "namespace": "default",
   "images": [
     {
       "imageId": "presentation-tier",

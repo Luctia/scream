@@ -13,7 +13,7 @@ public class ConfigurationMakerTest {
     void Should_Parse_Simple_Configuration_From_JSON_File() {
         Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/unorderedWithHealth.json");
         assertNotNull(config);
-        assertEquals("azure", config.platform());
+        assertEquals("default", config.namespace());
         assertEquals("presentation-tier", config.images().getFirst().imageId());
 
         assertEquals(1, config.images().size());
@@ -28,7 +28,7 @@ public class ConfigurationMakerTest {
         assertFalse(config.tests().ordered());
 
         assertEquals(1, config.tests().samplers().size());
-        assertEquals(Sampler.method.GET, config.tests().samplers().getFirst().method());
+        assertEquals(Sampler.Method.GET, config.tests().samplers().getFirst().method());
         assertEquals("/v1/policies/testid", config.tests().samplers().getFirst().path());
         assertEquals(99.9, config.tests().samplers().getFirst().percentage());
         assertEquals("{\"someProperty\": true}", config.tests().samplers().getFirst().requestBody());
@@ -42,7 +42,7 @@ public class ConfigurationMakerTest {
     void Should_Parse_Simple_Configuration_From_JSON_String() {
         String json = """
                 {
-                  "platform": "azure",
+                  "namespace": "default",
                   "images": [
                     {
                       "imageId": "presentation-tier",
@@ -70,12 +70,13 @@ public class ConfigurationMakerTest {
                   "performance": {
                     "throughput": 24050,
                     "throughputTimeUnit": "MINUTE",
-                    "latency": 50
+                    "latency": 50,
+                    "failureRate": 0.01
                   }
                 }
                 """;
         Configuration config = ConfigurationMaker.makeConfiguration(json);
-        assertEquals("azure", config.platform());
+        assertEquals("default", config.namespace());
         assertEquals("presentation-tier", config.images().getFirst().imageId());
 
         assertEquals(1, config.images().size());
@@ -90,7 +91,7 @@ public class ConfigurationMakerTest {
         assertFalse(config.tests().ordered());
 
         assertEquals(1, config.tests().samplers().size());
-        assertEquals(Sampler.method.GET, config.tests().samplers().getFirst().method());
+        assertEquals(Sampler.Method.GET, config.tests().samplers().getFirst().method());
         assertEquals("/v1/policies/testid", config.tests().samplers().getFirst().path());
         assertEquals(99.9, config.tests().samplers().getFirst().percentage());
         assertEquals("{\"someProperty\": true}", config.tests().samplers().getFirst().requestBody());
@@ -118,9 +119,6 @@ public class ConfigurationMakerTest {
         assertThrows(NullPointerException.class, () -> new TestSpecs(null, false, null));
         assertThrows(NullPointerException.class, () -> new Sampler(null, null, null, 0, null));
 
-        // Test lists not being empty
-        assertThrows(IllegalArgumentException.class, () -> new Configuration("azure", new ArrayList<>(), null, null));
-
         assertThrows(IllegalArgumentException.class, () -> new TestSpecs(null, false, new ArrayList<>()));
 
         // Test not-negative requirements
@@ -130,8 +128,9 @@ public class ConfigurationMakerTest {
         assertThrows(IllegalArgumentException.class, () -> new Image("id", "id", 1, false, 0, null));
         assertThrows(IllegalArgumentException.class, () -> new Image("id", "id", 1, false, -1, null));
 
-        assertThrows(IllegalArgumentException.class, () -> new PerformanceDemands(-1, null, 0));
-        assertThrows(IllegalArgumentException.class, () -> new PerformanceDemands(0, null, -1));
+        assertThrows(IllegalArgumentException.class, () -> new PerformanceDemands(-1, null, 0, 0));
+        assertThrows(IllegalArgumentException.class, () -> new PerformanceDemands(0, null, -1, 0));
+        assertThrows(IllegalArgumentException.class, () -> new PerformanceDemands(0, null, 0, -1));
 
         assertThrows(IllegalArgumentException.class, () -> new Sampler(null, null, "", -1, null));
 
@@ -142,7 +141,7 @@ public class ConfigurationMakerTest {
             List<Image> imageList = new ArrayList<>();
             imageList.add(image1);
             imageList.add(image2);
-            new Configuration("azure", imageList, null, null);
+            new Configuration("default", imageList, null, null);
         });
     }
 }
