@@ -1,15 +1,15 @@
 {
-  "namespace": "default",
+  "namespace": "screamtest",
   "images": [
     {
       "imageId": "nginxdemos/hello",
       "containerId": "nginx",
       "port": 80,
-      "isTestEndpoint": true,
       "minNumInstances": 1
     }
   ],
   "tests": {
+    "healthCheckUrl": "nginx/test",
     "ordered": false,
     "samplers": [
       {
@@ -24,6 +24,6 @@
     "throughput": 6000,
     "throughputTimeUnit": "MINUTE",
     "latency": 100,
-    "failureRate": 0.01
+    "failureRate": 0.0001
   }
 }

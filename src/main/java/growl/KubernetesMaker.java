@@ -2,15 +2,15 @@ package growl;
 
 import growl.domain.Configuration;
 import growl.domain.Image;
-import io.fabric8.kubernetes.api.model.IntOrString;
-import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.api.model.ServiceBuilder;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import resourcemanager.domain.ResourceLimits;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class KubernetesMaker {
@@ -87,11 +87,11 @@ public class KubernetesMaker {
     public static void generateK8sConfig(Configuration configuration) {
         PrintWriter writer;
         try {
-            writer = new PrintWriter("kubernetes/jmeter-deployment.yaml");
+            writer = new PrintWriter("kubernetes/scream-deployment.yaml");
             writer.print(JMETER_DEPLOYMENT_FILE);
             writer.close();
 
-            writer = new PrintWriter("kubernetes/jmeter-service.yaml");
+            writer = new PrintWriter("kubernetes/scream-service.yaml");
             writer.print(String.format(SERVICE_TEMPLATE, "jmeter", "jmeter", "jmeter"));
             writer.close();
         } catch (IOException e) {
@@ -115,43 +115,43 @@ public class KubernetesMaker {
     }
 
     public static List<Deployment> generateDeployments(Configuration configuration) {
-        List<Deployment> deployments = new ArrayList<>();
-        for (Image image : configuration.images()) {
-            // @formatter:off
-            deployments.add(
-                    new DeploymentBuilder()
-                    .withNewMetadata()
-                        .withName(image.imageId())
-                        .addToLabels("scream.service", image.imageId())
-                    .endMetadata()
-                    .withNewSpec()
-                        .withReplicas(1)
-                        .withNewTemplate()
-                            .withNewMetadata()
-                                .addToLabels("scream.service", image.imageId())
-                            .endMetadata()
-                            .withNewSpec()
-                            .addNewContainer()
-                                .withName(image.imageId())
-                                .withImage(image.containerId())
-                                .withImagePullPolicy("Never")
-                                .addNewPort()
-                                    .withProtocol("TCP")
-                                    .withContainerPort(80)
-                                .endPort()
-                                .withRestartPolicy("Always")
-                            .endContainer()
-                        .endSpec()
-                    .endTemplate()
-                    .withNewSelector()
-                        .addToMatchLabels("scream.service", image.imageId())
-                    .endSelector()
+        ResourceRequirements defaultLimits = new ResourceLimits(new Quantity("500m"), new Quantity("500M")).toResourceRequirements();
+        return configuration.images().stream().map(i -> generateDeployment(i, defaultLimits)).toList();
+    }
+
+    public static Deployment generateDeployment(Image image, ResourceRequirements resourceRequirements) {
+        // @formatter:off
+        return new DeploymentBuilder()
+                .withNewMetadata()
+                    .withName(image.containerId())
+                    .addToLabels("scream.service", image.containerId())
+                .endMetadata()
+                .withNewSpec()
+                    .withReplicas(image.minNumInstances())
+                    .withNewTemplate()
+                        .withNewMetadata()
+                            .addToLabels("scream.service", image.containerId())
+                        .endMetadata()
+                        .withNewSpec()
+                        .addNewContainer()
+                            .withName(image.containerId())
+                            .addToEnv((EnvVar[]) image.env().keySet().stream().map(k -> new EnvVarBuilder().withName(k).withValue(image.env().get(k)).build()).toArray())
+                            .withImage(image.imageId())
+                            .withImagePullPolicy("Never")
+                            .withResources(resourceRequirements)
+                            .addNewPort()
+                                .withProtocol("TCP")
+                                .withContainerPort(image.port())
+                            .endPort()
+                        .endContainer()
                     .endSpec()
-                    .build()
-            );
-            // @formatter:on
-        }
-        return deployments;
+                .endTemplate()
+                .withNewSelector()
+                    .addToMatchLabels("scream.service", image.containerId())
+                .endSelector()
+                .endSpec()
+                .build();
+        // @formatter:on
     }
 
     public static Deployment generateJMeterDeployment() {
@@ -176,7 +176,6 @@ public class KubernetesMaker {
                                 .withProtocol("TCP")
                                 .withContainerPort(80)
                             .endPort()
-                            .withRestartPolicy("Always")
                             .withCommand("./bin/jmeter", "-n", "-t", "config.jmx")
                         .endContainer()
                     .endSpec()
@@ -196,8 +195,8 @@ public class KubernetesMaker {
             services.add(
                     new ServiceBuilder()
                             .withNewMetadata()
-                                .withName(image.imageId())
-                                .addToLabels("scream.service", image.imageId())
+                                .withName(image.containerId())
+                                .addToLabels("scream.service", image.containerId())
                             .endMetadata()
                             .withNewSpec()
                                 .addNewPort()
@@ -205,7 +204,7 @@ public class KubernetesMaker {
                                     .withTargetPort(new IntOrString(80))
                                     .withPort(80)
                                 .endPort()
-                                .addToSelector("scream.service", image.imageId())
+                                .addToSelector("scream.service", image.containerId())
                             .endSpec()
                             .build()
             );

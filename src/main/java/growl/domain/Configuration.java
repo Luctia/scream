@@ -29,7 +29,7 @@ public record Configuration(String namespace, List<Image> images, TestSpecs test
         return String.format("""
                 <hashTree>
                 <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan">
-                <boolProp name="TestPlan.serialize_threadgroups">%s</boolProp>
+                <boolProp name="TestPlan.serialize_threadgroups">true</boolProp>
                 <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
                 <collectionProp name="Arguments.arguments"/>
                 </elementProp>
@@ -37,6 +37,7 @@ public record Configuration(String namespace, List<Image> images, TestSpecs test
                 </TestPlan>
                 %s
                 </hashTree>
-                """, tests.ordered() ? "true" : "false", tests.toXML(performance));
+                """,
+                tests.toXML(performance));
     }
 }

@@ -6,33 +6,36 @@ import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.dsl.NonDeletingOperation;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import resourcemanager.domain.ResourceLimits;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ResourceManager {
     public static void setNewResourceLimits(ResourceLimits resourceLimits, String serviceName, Configuration config) {
         try (KubernetesClient k8s = new KubernetesClientBuilder().build()) {
-            k8s.pods().inNamespace(config.namespace()).list().getItems().stream()
-                    .filter(pod -> pod.getMetadata().getName().contains(serviceName))
-                    .map(Pod::getSpec)
-                    .map(PodSpec::getContainers).flatMap(List::stream)
-                    .forEach(container -> container.setResources(resourceLimits.toResourceRequirements()));
+            Deployment replacementWithNewLimits = KubernetesMaker.generateDeployment(config.images().stream().filter(i -> i.containerId().equals(serviceName)).findFirst().orElseThrow(), resourceLimits.toResourceRequirements());
+            System.out.printf("Resources to be set at %s%n", resourceLimits);
+            k8s.apps().deployments().inNamespace(config.namespace()).resource(replacementWithNewLimits).forceConflicts().serverSideApply();
+            System.out.println("Actual resources:");
+            try {
+                ResourceLimits actualResourceLimits = getResourceLimits(serviceName, config);
+                System.out.println(actualResourceLimits);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
     public static ResourceLimits getResourceLimits(String podName, Configuration config) throws Exception {
         try (KubernetesClient k8s = new KubernetesClientBuilder().build()) {
             NonNamespaceOperation<Pod, PodList, PodResource> pods = k8s.pods().inNamespace(config.namespace());
-            String finalPodName = podName;
-            List<Pod> candidates = pods.list().getItems().stream().filter(p -> p.getMetadata().getName().contains(finalPodName)).toList();
-            if (candidates.isEmpty()) {
-                throw new Exception("No viable candidates found");
-            }
-            if (candidates.size() > 1) {
-                throw new Exception("More than one viable candidate found");
+            List<Pod> candidates = new ArrayList<>();
+            while (candidates.isEmpty()) {
+                candidates = pods.list().getItems().stream().filter(p -> p.getMetadata().getName().contains(podName)).toList();
             }
             return new ResourceLimits(
                     candidates.getFirst().getSpec().getContainers().getFirst().getResources()
@@ -48,10 +51,10 @@ public class ResourceManager {
         List<Service> services = KubernetesMaker.generateServices(configuration);
         try (KubernetesClient k8s = new KubernetesClientBuilder().build()) {
             for (Deployment deployment : deployments) {
-                k8s.apps().deployments().inNamespace(configuration.namespace()).resource(deployment).create();
+                k8s.apps().deployments().inNamespace(configuration.namespace()).resource(deployment).createOr(NonDeletingOperation::patch);
             }
             for (Service service : services) {
-                k8s.services().inNamespace(configuration.namespace()).resource(service).create();
+                k8s.services().inNamespace(configuration.namespace()).resource(service).createOr(NonDeletingOperation::patch);
             }
         }
     }

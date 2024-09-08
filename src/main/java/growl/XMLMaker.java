@@ -12,6 +12,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -63,12 +64,12 @@ public class XMLMaker {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             transformerFactory.setAttribute("indent-number", 2);
 
-            File xslFile = new File("src/main/resources/prettyprint.xsl");
-            Scanner reader = new Scanner(xslFile);
+            Scanner reader = new Scanner(Objects.requireNonNull(XMLMaker.class.getClassLoader().getResourceAsStream("prettyprint.xsl")));
             StringBuilder xslt = new StringBuilder();
             while (reader.hasNextLine()) {
                 xslt.append(reader.nextLine());
             }
+            // dException: nested:/jmeter/scream-0.0.1-SNAPSHOT.jar/!BOOT-INF/classes/!/prettyprint.xsl (No such file or
             reader.close();
             Transformer transformer = transformerFactory.newTransformer(new StreamSource(new StringReader(xslt.toString())));
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");

@@ -2,12 +2,12 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    scream.service: jmeter
-  name: jmeter
+    scream.service: scream
+  name: scream
 spec:
   ports:
     - name: "80"
       port: 80
       targetPort: 80
   selector:
-    scream.service: jmeter
+    scream.service: scream

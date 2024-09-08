@@ -28,6 +28,69 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
                 <hashTree>
                 %s
                 %s
+                <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
+                <intProp name="ThreadGroup.num_threads">1</intProp>
+                <intProp name="ThreadGroup.ramp_time">1</intProp>
+                <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+                <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+                <elementProp elementType="LoopController" guiclass="LoopControlPanel" name="ThreadGroup.main_controller" testclass="LoopController" testname="Loop Controller">
+                <stringProp name="LoopController.loops">1</stringProp>
+                <boolProp name="LoopController.continue_forever">false</boolProp>
+                </elementProp>
+                </ThreadGroup>
+                <hashTree>
+                <kg.apc.jmeter.samplers.DummySampler guiclass="kg.apc.jmeter.samplers.DummySamplerGui" testclass="kg.apc.jmeter.samplers.DummySampler" testname="jp@gc - Dummy Sampler">
+                <boolProp name="WAITING">true</boolProp>
+                <boolProp name="SUCCESFULL">true</boolProp>
+                <stringProp name="RESPONSE_CODE">200</stringProp>
+                <stringProp name="RESPONSE_MESSAGE">OK</stringProp>
+                <stringProp name="REQUEST_DATA">Dummy Sampler used to simulate requests and responses without actual network activity. This helps debugging tests.</stringProp>
+                <stringProp name="RESPONSE_DATA">Dummy Sampler used to simulate requests and responses without actual network activity. This helps debugging tests.</stringProp>
+                <stringProp name="RESPONSE_TIME">${__Random(50,500)}</stringProp>
+                <stringProp name="LATENCY">${__Random(1,50)}</stringProp>
+                <stringProp name="CONNECT">${__Random(1,5)}</stringProp>
+                <stringProp name="URL"/>
+                <stringProp name="RESULT_CLASS">org.apache.jmeter.samplers.SampleResult</stringProp>
+                </kg.apc.jmeter.samplers.DummySampler>
+                <hashTree/>
+                <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
+                <boolProp name="ResultCollector.error_logging">false</boolProp>
+                <objProp>
+                <name>saveConfig</name>
+                <value class="SampleSaveConfiguration">
+                <time>true</time>
+                <latency>true</latency>
+                <timestamp>true</timestamp>
+                <success>true</success>
+                <label>true</label>
+                <code>true</code>
+                <message>true</message>
+                <threadName>true</threadName>
+                <dataType>true</dataType>
+                <encoding>false</encoding>
+                <assertions>true</assertions>
+                <subresults>true</subresults>
+                <responseData>false</responseData>
+                <samplerData>false</samplerData>
+                <xml>false</xml>
+                <fieldNames>true</fieldNames>
+                <responseHeaders>false</responseHeaders>
+                <requestHeaders>false</requestHeaders>
+                <responseDataOnError>false</responseDataOnError>
+                <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+                <assertionsResultsToSave>0</assertionsResultsToSave>
+                <bytes>true</bytes>
+                <sentBytes>true</sentBytes>
+                <url>true</url>
+                <threadCounts>true</threadCounts>
+                <idleTime>true</idleTime>
+                <connectTime>true</connectTime>
+                </value>
+                </objProp>
+                <stringProp name="filename">finished.csv</stringProp>
+                </ResultCollector>
+                <hashTree/>
+                </hashTree>
                 </hashTree>
                 """, healthCheckUrl == null ? "" : healthCheckConfig(), samplerString);
     }

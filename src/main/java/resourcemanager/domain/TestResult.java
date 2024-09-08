@@ -14,27 +14,37 @@ public class TestResult {
     public static TestResult testResultFromCSVLines(String CSV) {
         List<String> CSVLines = Arrays.stream(CSV.split("\n")).toList();
         List<TestResultLine> testResultLines = new ArrayList<>();
-        for (String line : CSVLines.subList(1, CSVLines.size())) {
-            String[] splitLine = line.split(",");
-            testResultLines.add(new TestResultLine(
-                    Long.parseLong(splitLine[0]),
-                    Integer.parseInt(splitLine[1]),
-                    splitLine[2],
-                    Integer.parseInt(splitLine[3]),
-                    splitLine[4],
-                    splitLine[5],
-                    splitLine[6],
-                    Boolean.parseBoolean(splitLine[7]),
-                    splitLine[8],
-                    Long.parseLong(splitLine[9]),
-                    Long.parseLong(splitLine[10]),
-                    Integer.parseInt(splitLine[11]),
-                    Integer.parseInt(splitLine[12]),
-                    splitLine[13],
-                    Integer.parseInt(splitLine[14]),
-                    Integer.parseInt(splitLine[15]),
-                    Integer.parseInt(splitLine[16])
-            ));
+        try {
+            for (String line : CSVLines.subList(1, CSVLines.size())) {
+                String[] splitLine = line.split(",");
+                if (splitLine[3].contains("HTTP")) {
+                    splitLine[3] = "500";
+                    splitLine[7] = "false";
+                }
+                testResultLines.add(new TestResultLine(
+                        Long.parseLong(splitLine[0]),
+                        Integer.parseInt(splitLine[1]),
+                        splitLine[2],
+                        Integer.parseInt(splitLine[3]),
+                        splitLine[4],
+                        splitLine[5],
+                        splitLine[6],
+                        Boolean.parseBoolean(splitLine[7]),
+                        splitLine[8],
+                        Long.parseLong(splitLine[9]),
+                        Long.parseLong(splitLine[10]),
+                        Integer.parseInt(splitLine[11]),
+                        Integer.parseInt(splitLine[12]),
+                        splitLine[13],
+                        Integer.parseInt(splitLine[14]),
+                        Integer.parseInt(splitLine[15]),
+                        Integer.parseInt(splitLine[16])
+                ));
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("==========");
+            System.out.println("Error parsing CSV:");
+            CSVLines.forEach(System.out::println);
         }
         return new TestResult(testResultLines);
     }

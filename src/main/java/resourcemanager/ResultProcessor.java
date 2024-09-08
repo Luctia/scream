@@ -8,6 +8,7 @@ import resourcemanager.domain.TestResult;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -33,6 +34,7 @@ public class ResultProcessor {
      * @return whether the correct limits have been found
      */
     public boolean processNewResults(Set<String> resultFileNames, Configuration configuration) {
+        System.out.println("Processing new results...");
         try {
             Set<File> resultFiles = resultFileNames.stream()
                     .map(Paths::get)
@@ -54,17 +56,18 @@ public class ResultProcessor {
                 // Determine whether the goals are met within margins, otherwise determine new constraints and run again.
                 // First, get the resource limits that were used. If these do not yet exist, this is the first run. The
                 //  first run is always performed with 500m CPU and 500M memory, so we can use that as default.
-                ResourceLimits usedLimits = usedResourceLimits
+                final ResourceLimits usedLimits = usedResourceLimits
                         .getOrDefault(filename, new ResourceLimits(new Quantity("500m"), new Quantity("500M")));
-                String identifier = extractId(filename);
                 if (evaluatePerformance(configuration.performance(), testResults.get(filename)) > 0) {
                     // Must loosen limits
                     this.updateHighestFailedLimits(filename, usedLimits);
-                    ResourceLimits newLimits = new ResourceLimits(
+                    final ResourceLimits newLimits = new ResourceLimits(
                             multiplyQuantity(usedLimits.cpu(), 1 + evaluatePerformance(configuration.performance(), testResults.get(filename))),
                             multiplyQuantity(usedLimits.memory(), 1 + evaluatePerformance(configuration.performance(), testResults.get(filename)))
                     );
                     ResourceManager.setNewResourceLimits(newLimits, extractId(filename), configuration);
+                    System.out.printf("Undershot with limits: %s%n", usedLimits); // TODO these are the same lol
+                    System.out.printf("Trying again with limits: %s%n", newLimits);
                     this.usedResourceLimits.put(filename, newLimits);
                     allPassed = false;
                 } else {
@@ -73,13 +76,15 @@ public class ResultProcessor {
                     if (overshotCoefficient > 0) {
                         // Must tighten memory limits
                         allPassed = false;
-                        ResourceLimits newLimits = new ResourceLimits(usedLimits.cpu(), multiplyQuantity(usedLimits.memory(), 1 - (overshotCoefficient / 2)));
+                        final ResourceLimits newLimits = new ResourceLimits(usedLimits.cpu(), multiplyQuantity(usedLimits.memory(), 1 - (overshotCoefficient * 0.8)));
                         ResourceManager.setNewResourceLimits(newLimits, extractId(filename), configuration);
+                        this.usedResourceLimits.put(filename, newLimits);
                     } else if (overshotCoefficient < 0) {
                         // Must tighten CPU limits
                         allPassed = false;
-                        ResourceLimits newLimits = new ResourceLimits(multiplyQuantity(usedLimits.cpu(), 1 - (overshotCoefficient / 2)), usedLimits.memory());
+                        final ResourceLimits newLimits = new ResourceLimits(multiplyQuantity(usedLimits.cpu(), 1 - (overshotCoefficient * -0.8)), usedLimits.memory());
                         ResourceManager.setNewResourceLimits(newLimits, extractId(filename), configuration);
+                        this.usedResourceLimits.put(filename, newLimits);
                     }
                 }
             }
@@ -105,20 +110,23 @@ public class ResultProcessor {
     }
 
     private double checkOvershoot(ResourceLimits recentResourceLimits, String fileName) throws Exception {
-        if (recentResourceLimits.cpu().getNumericalAmount().compareTo(highestFailedResources.get(fileName).cpu().getNumericalAmount()) < 0
-                || recentResourceLimits.memory().getNumericalAmount().compareTo(highestFailedResources.get(fileName).memory().getNumericalAmount()) < 0) {
-            throw new Exception("Unexpected behavior: tests passed with fewer resources than previously failed tests.");
-        }
         if (highestFailedResources.isEmpty()) {
             // This means this was the first try, but if we get here it means the tests passed.
-            // Therefore, we slice memory in half as a default behaviour.
-            return 0.5;
+            // Therefore, we slice cpu in half as a default behaviour.
+            return -0.5;
         }
-        double cpuCoefficient = recentResourceLimits.cpu().getNumericalAmount().divide(highestFailedResources.get(fileName).cpu().getNumericalAmount()).subtract(new BigDecimal("1")).doubleValue();
+//        if (recentResourceLimits.cpu().getNumericalAmount().compareTo(highestFailedResources.get(fileName).cpu().getNumericalAmount()) < 0
+//                || recentResourceLimits.memory().getNumericalAmount().compareTo(highestFailedResources.get(fileName).memory().getNumericalAmount()) < 0) {
+//            throw new Exception("Unexpected behavior: tests passed with fewer resources than previously failed tests.");
+//        }
+        System.out.println("Checking overshoot...");
+        System.out.printf("Recent resource limits: %s%n", recentResourceLimits);
+        System.out.printf("Highest failed resource limits: %s%n", highestFailedResources.get(fileName));
+        double cpuCoefficient = recentResourceLimits.cpu().getNumericalAmount().divide(highestFailedResources.get(fileName).cpu().getNumericalAmount(), RoundingMode.UP).subtract(new BigDecimal("1")).doubleValue();
         if (cpuCoefficient > 0.1) {
             return -cpuCoefficient;
         }
-        double memoryCoefficient = recentResourceLimits.memory().getNumericalAmount().divide(highestFailedResources.get(fileName).memory().getNumericalAmount()).subtract(new BigDecimal("1")).doubleValue();
+        double memoryCoefficient = recentResourceLimits.memory().getNumericalAmount().divide(highestFailedResources.get(fileName).memory().getNumericalAmount(), RoundingMode.UP).subtract(new BigDecimal("1")).doubleValue();
         if (memoryCoefficient > 0.1) {
             return memoryCoefficient;
         }
@@ -126,17 +134,45 @@ public class ResultProcessor {
     }
 
     private void updateHighestFailedLimits(String filename, ResourceLimits limits) {
-        if (highestFailedResources.containsKey(filename) && (highestFailedResources.get(filename).cpu().compareTo(limits.cpu()) < 1 || highestFailedResources.get(filename).memory().compareTo(limits.memory()) < 1)) {
+        if (highestFailedResources.containsKey(filename)) {
+            ResourceLimits currentLimits = highestFailedResources.get(filename);
+            if (currentLimits.cpu().compareTo(limits.cpu()) < 1) {
+                currentLimits = new ResourceLimits(limits.cpu(), currentLimits.memory());
+                highestFailedResources.put(filename, currentLimits);
+            }
+            if (highestFailedResources.get(filename).memory().compareTo(limits.memory()) < 1) {
+                currentLimits = new ResourceLimits(currentLimits.cpu(), limits.memory());
+                highestFailedResources.put(filename, currentLimits);
+            }
+        } else {
             highestFailedResources.put(filename, limits);
         }
+//        if (highestFailedResources.containsKey(filename) && (highestFailedResources.get(filename).cpu().compareTo(limits.cpu()) < 1 || highestFailedResources.get(filename).memory().compareTo(limits.memory()) < 1)) {
+//            highestFailedResources.put(filename, limits);
+//        }
     }
 
     private static String extractId(String filename) {
-        return filename.substring(filename.indexOf('_') + 1, filename.lastIndexOf('_'));
+        return filename.substring(filename.indexOf('_') + 1, filename.indexOf('_', filename.indexOf('_') + 1));
     }
 
-    private Quantity multiplyQuantity(Quantity quantity, double multiplier) {
-        quantity.setAmount(new BigDecimal(quantity.getAmount()).multiply(new BigDecimal(multiplier)).toString());
-        return quantity;
+    private static Quantity multiplyQuantity(Quantity quantity, double multiplier) {
+        Quantity newQuantity = new Quantity();
+        newQuantity.setAmount(new BigDecimal(quantity.getAmount()).multiply(new BigDecimal(multiplier)).toString());
+        newQuantity.setFormat(quantity.getFormat());
+        return newQuantity;
+    }
+
+    public void printResources(Configuration configuration) throws Exception {
+        if (this.usedResourceLimits.isEmpty()) {
+            System.out.println("No resource limits yet");
+        }
+        for (String key : this.usedResourceLimits.keySet()) {
+            var realResources = ResourceManager.getResourceLimits(extractId(key), configuration);
+            System.out.println("For " + key);
+            System.out.println("CPU: " + realResources.cpu());
+            System.out.println("Memory: " + realResources.memory());
+            System.out.println();
+        }
     }
 }
