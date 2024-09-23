@@ -1,5 +1,6 @@
 package growl.domain;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -20,5 +21,6 @@ public record Image(String imageId, String containerId, int port, boolean isTest
         Objects.requireNonNull(containerId, "containerId cannot be null");
         if (port < 1 || port > 65535) {throw new IllegalArgumentException("Port number must be between 1 and 65535");}
         if (minNumInstances < 1) {throw new IllegalArgumentException("Number of instances must be more than 0");}
+        if (env == null) env = new HashMap<>();
     }
 }

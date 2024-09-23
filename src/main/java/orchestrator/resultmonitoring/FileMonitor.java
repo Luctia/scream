@@ -15,6 +15,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class FileMonitor {
@@ -32,9 +33,11 @@ public class FileMonitor {
 
     @Async
     @PostConstruct
-    public void launchMonitoring() {
+    public void launchMonitoring() throws IOException {
         System.out.println("START_MONITORING");
-        ResultProcessor processor = new ResultProcessor();
+        ResultProcessor processor = new ResultProcessor(configuration);
+        processor.buildConfig();
+        Runtime.getRuntime().exec(new String[]{"./bin/jmeter", "-n", "-t", "config.jmx"});
         try {
             WatchKey key;
             while ((key = watchService.take()) != null && !finished) {
@@ -43,7 +46,7 @@ public class FileMonitor {
                         // If a CSV has been made or changed, this is likely a results file, which means we have
                         //  something to do.
                         this.resultFiles.add(event.context().toString());
-                        if (finished()) {
+                        if (jmeterDone()) {
                             // We have now observed the creation of the finished.csv file, and it contains two lines
                             //  (one for CSV headers and a first result). This means JMeter is done.
                             resultFiles.remove("finished.csv");
@@ -53,7 +56,10 @@ public class FileMonitor {
                             new File("finished.csv").delete();
                             this.resultFiles.forEach(f -> new File(f).delete());
                             this.resultFiles.clear();
-                            Runtime.getRuntime().exec(new String[]{"./bin/jmeter", "-n", "-t", "config.jmx"});
+                            if (!finished) {
+                                processor.buildConfig();
+                                Runtime.getRuntime().exec(new String[]{"./bin/jmeter", "-n", "-t", "config.jmx"});
+                            }
                         }
                     }
                 }
@@ -61,6 +67,7 @@ public class FileMonitor {
             }
             System.out.println("Optimal resource limits found:");
             processor.printResources(configuration);
+            TimeUnit.MINUTES.sleep(60);
         } catch (InterruptedException e) {
             System.out.println("Interrupted while watching file monitoring");
         } catch (Exception e) {
@@ -80,7 +87,7 @@ public class FileMonitor {
         }
     }
 
-    private static boolean finished() {
+    private static boolean jmeterDone() {
         if (new File("finished.csv").exists()) {
             BufferedReader reader;
             try {

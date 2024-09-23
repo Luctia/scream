@@ -24,6 +24,6 @@
     "throughput": 6000,
     "throughputTimeUnit": "MINUTE",
     "latency": 100,
-    "failureRate": 0.0001
+    "failureRate": 0.01
   }
 }

@@ -10,7 +10,6 @@ import resourcemanager.domain.ResourceLimits;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class KubernetesMaker {
@@ -115,7 +114,7 @@ public class KubernetesMaker {
     }
 
     public static List<Deployment> generateDeployments(Configuration configuration) {
-        ResourceRequirements defaultLimits = new ResourceLimits(new Quantity("500m"), new Quantity("500M")).toResourceRequirements();
+        ResourceRequirements defaultLimits = new ResourceLimits(new Quantity("500m"), new Quantity("1M")).toResourceRequirements();
         return configuration.images().stream().map(i -> generateDeployment(i, defaultLimits)).toList();
     }
 
@@ -135,7 +134,7 @@ public class KubernetesMaker {
                         .withNewSpec()
                         .addNewContainer()
                             .withName(image.containerId())
-                            .addToEnv((EnvVar[]) image.env().keySet().stream().map(k -> new EnvVarBuilder().withName(k).withValue(image.env().get(k)).build()).toArray())
+//                            .addToEnv((EnvVar[]) image.env().entrySet().stream().map(e -> new EnvVarBuilder().withName(e.getKey()).withValue(e.getValue()).build()).toArray(new EnvVar[3]))
                             .withImage(image.imageId())
                             .withImagePullPolicy("Never")
                             .withResources(resourceRequirements)

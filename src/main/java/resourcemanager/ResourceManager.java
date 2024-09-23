@@ -13,17 +13,24 @@ import resourcemanager.domain.ResourceLimits;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ResourceManager {
     public static void setNewResourceLimits(ResourceLimits resourceLimits, String serviceName, Configuration config) {
         try (KubernetesClient k8s = new KubernetesClientBuilder().build()) {
-            Deployment replacementWithNewLimits = KubernetesMaker.generateDeployment(config.images().stream().filter(i -> i.containerId().equals(serviceName)).findFirst().orElseThrow(), resourceLimits.toResourceRequirements());
-            System.out.printf("Resources to be set at %s%n", resourceLimits);
-            k8s.apps().deployments().inNamespace(config.namespace()).resource(replacementWithNewLimits).forceConflicts().serverSideApply();
-            System.out.println("Actual resources:");
             try {
-                ResourceLimits actualResourceLimits = getResourceLimits(serviceName, config);
-                System.out.println(actualResourceLimits);
+                ResourceLimits oldLimits = getResourceLimits(serviceName, config);
+                Deployment replacementWithNewLimits = KubernetesMaker.generateDeployment(config.images().stream().filter(i -> i.containerId().equals(serviceName)).findFirst().orElseThrow(), resourceLimits.toResourceRequirements());
+                System.out.printf("Resources to be set at %s%n", resourceLimits);
+                k8s.apps().deployments().inNamespace(config.namespace()).resource(replacementWithNewLimits).forceConflicts().serverSideApply();
+                System.out.println("Actual resources:");
+                for (int i = 0; i < 20; i++) {
+                    TimeUnit.SECONDS.sleep(5);
+                    if (!getResourceLimits(serviceName, config).equals(oldLimits)) {
+                        break;
+                    }
+                }
+                System.out.println(getResourceLimits(serviceName, config));
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }

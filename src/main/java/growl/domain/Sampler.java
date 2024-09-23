@@ -21,20 +21,7 @@ public record Sampler(Method method, String targetId, String path, double percen
     }
 
     public String toXML(int maxRPS, int MRT, int index) {
-        String bodySection;
-        if (requestBody != null) {
-            bodySection = String.format("""
-                    <collectionProp name="Arguments.arguments">
-                    <elementProp name="" elementType="HTTPArgument">
-                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">%s</stringProp>
-                    <stringProp name="Argument.metadata">=</stringProp>
-                    </elementProp>
-                    </collectionProp>
-                    """, requestBody.replaceAll("\"", "&quot;"));
-        } else {
-            bodySection = "<collectionProp name=\"Arguments.arguments\"/>";
-        }
+        String bodySection = getBodySection();
         String tstIdentifier = this.method + "_" + targetId + "_" + this.path.replaceAll("/", "") + "_" + index;
         return String.format("""
                 <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
@@ -121,6 +108,24 @@ public record Sampler(Method method, String targetId, String path, double percen
                 bodySection,
                 tstIdentifier
         );
+    }
+
+    private String getBodySection() {
+        String bodySection;
+        if (requestBody != null) {
+            bodySection = String.format("""
+                    <collectionProp name="Arguments.arguments">
+                    <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">%s</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                    </elementProp>
+                    </collectionProp>
+                    """, requestBody.replaceAll("\"", "&quot;"));
+        } else {
+            bodySection = "<collectionProp name=\"Arguments.arguments\"/>";
+        }
+        return bodySection;
     }
 
     private String generateVariableThroughputTimer(int maxRPS, String identifier) {

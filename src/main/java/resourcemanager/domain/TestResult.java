@@ -14,13 +14,13 @@ public class TestResult {
     public static TestResult testResultFromCSVLines(String CSV) {
         List<String> CSVLines = Arrays.stream(CSV.split("\n")).toList();
         List<TestResultLine> testResultLines = new ArrayList<>();
-        try {
-            for (String line : CSVLines.subList(1, CSVLines.size())) {
-                String[] splitLine = line.split(",");
-                if (splitLine[3].contains("HTTP")) {
-                    splitLine[3] = "500";
-                    splitLine[7] = "false";
-                }
+        for (String line : CSVLines.subList(1, CSVLines.size())) {
+            String[] splitLine = line.split(",");
+            if (splitLine[3].contains("HTTP")) {
+                splitLine[3] = "500";
+                splitLine[7] = "false";
+            }
+            try {
                 testResultLines.add(new TestResultLine(
                         Long.parseLong(splitLine[0]),
                         Integer.parseInt(splitLine[1]),
@@ -40,17 +40,33 @@ public class TestResult {
                         Integer.parseInt(splitLine[15]),
                         Integer.parseInt(splitLine[16])
                 ));
+            } catch (NumberFormatException e) {
+                testResultLines.add(new TestResultLine(
+                        1,
+                        1,
+                        splitLine[2],
+                        500,
+                        splitLine[4],
+                        splitLine[5],
+                        splitLine[6],
+                        false,
+                        splitLine[8],
+                        1,
+                        1,
+                        1,
+                        1,
+                        splitLine[13],
+                        1,
+                        1,
+                        1
+                ));
             }
-        } catch (NumberFormatException e) {
-            System.out.println("==========");
-            System.out.println("Error parsing CSV:");
-            CSVLines.forEach(System.out::println);
         }
         return new TestResult(testResultLines);
     }
 
     public List<TestResultLine> getFailedRequests() {
-        return this.testResultLines.stream().filter(l -> !l.success).toList();
+        return this.testResultLines.stream().filter(l -> !l.success || l.responseCode > 300).toList();
     }
 
     public double getAvgLatency() {
@@ -70,20 +86,21 @@ public class TestResult {
 
     public String toReport() {
         return String.format("""
-               ========= Load testing report =========
-               Average latency:             %s ms
-               Latency during last phase:   %s ms
-               Number of non-200 responses: %s
-               =======================================
-               """,
+                        ========= Load testing report =========
+                        Average latency:             %s ms
+                        Latency during last phase:   %s ms
+                        Number of non-200 responses: %s
+                        =======================================
+                        """,
                 this.getAvgLatency(),
                 this.getLastLatency(),
                 this.getFailedRequests().size()
-                );
+        );
     }
 
-    public record TestResultLine (long timeStamp, int elapsed, String label, int responseCode, String responseMessage,
-                                  String threadName, String dataType, boolean success, String failureMessage, long bytes,
-                                  long sentBytes, int grpThreads, int allThreads, String URL, int latency, int idleTime,
-                                  int connect) {}
+    public record TestResultLine(long timeStamp, int elapsed, String label, int responseCode, String responseMessage,
+                                 String threadName, String dataType, boolean success, String failureMessage, long bytes,
+                                 long sentBytes, int grpThreads, int allThreads, String URL, int latency, int idleTime,
+                                 int connect) {
+    }
 }
