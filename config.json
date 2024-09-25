@@ -2,20 +2,31 @@
   "namespace": "screamtest",
   "images": [
     {
-      "imageId": "nginxdemos/hello",
-      "containerId": "nginx",
+      "imageId": "load",
+      "containerId": "load",
       "port": 80,
       "minNumInstances": 1
     }
   ],
   "tests": {
-    "healthCheckUrl": "nginx/test",
+    "healthCheckUrl": "/actuator/health",
+    "healthCheckTarget": "load",
     "ordered": false,
     "samplers": [
       {
         "method": "GET",
-        "targetId": "nginx",
-        "path": "/test",
+        "targetId": "load",
+        "path": "/encrypt",
+        "percentage": 100
+      },{
+        "method": "GET",
+        "targetId": "load",
+        "path": "/fillup",
+        "percentage": 100
+      },{
+        "method": "GET",
+        "targetId": "load",
+        "path": "/both",
         "percentage": 100
       }
     ]
@@ -24,6 +35,7 @@
     "throughput": 6000,
     "throughputTimeUnit": "MINUTE",
     "latency": 100,
-    "failureRate": 0.01
+    "failureRate": 0.01,
+    "maxOvershoot": 0.1
   }
 }

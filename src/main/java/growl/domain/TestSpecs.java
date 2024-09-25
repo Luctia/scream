@@ -1,6 +1,7 @@
 package growl.domain;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -11,17 +12,18 @@ import java.util.Objects;
  * @param ordered        whether to execute all tests in the sequence they were given. Defaults to false
  * @param samplers       list of samplers. Required and should not be empty
  */
-public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> samplers) {
+public record TestSpecs(String healthCheckUrl, String healthCheckTarget, boolean ordered, List<Sampler> samplers) {
     public TestSpecs {
         Objects.requireNonNull(samplers, "samplers cannot be null");
         if (samplers.isEmpty()) throw new IllegalArgumentException("samplers may not be empty");
+
     }
 
-    public String toXML(PerformanceDemands performanceDemands) {
+    public String toXML(PerformanceDemands performanceDemands, Map<String, Integer> ports) {
         StringBuilder samplerString = new StringBuilder();
         for (int i = 0; i < samplers().size(); i++) {
             Sampler sampler = samplers().get(i);
-            samplerString.append(sampler.toXML((int) ((performanceDemands.throughput() * sampler.percentage() / 100) / 60), performanceDemands.latency(), i));
+            samplerString.append(sampler.toXML((int) ((performanceDemands.throughput() * sampler.percentage() / 100) / 60), performanceDemands.latency(), i, ports.get(sampler.targetId())));
             samplerString.append("<hashTree/>\n</hashTree>\n");
         }
         return String.format("""
@@ -92,10 +94,10 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
                 <hashTree/>
                 </hashTree>
                 </hashTree>
-                """, healthCheckUrl == null ? "" : healthCheckConfig(), samplerString);
+                """, healthCheckUrl == null ? "" : healthCheckConfig(ports.get(healthCheckTarget)), samplerString);
     }
 
-    private String healthCheckConfig() {
+    private String healthCheckConfig(int port) {
         String base = """
                 <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Health check thread group">
                 <intProp name="ThreadGroup.num_threads">1</intProp>
@@ -115,6 +117,8 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
                 <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Health check" enabled="true">
                 <stringProp name="HTTPSampler.domain">%s</stringProp>
                 <stringProp name="HTTPSampler.protocol">%s</stringProp>
+                <stringProp name="HTTPSampler.port">%s</stringProp>
+                <stringProp name="HTTPSampler.path">%s</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">GET</stringProp>
                 <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -143,6 +147,6 @@ public record TestSpecs(String healthCheckUrl, boolean ordered, List<Sampler> sa
                 </hashTree>
                 """;
         // TODO determine protocol
-        return String.format(base, healthCheckUrl, "http");
+        return String.format(base, healthCheckTarget, "http", port, healthCheckUrl);
     }
 }

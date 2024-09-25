@@ -14,6 +14,7 @@
   ],
   "tests": {
     "healthCheckUrl": "/v1/ping",
+    "healthCheckTarget": "presentation-tier",
     "ordered": false,
     "samplers": [
       {
@@ -29,6 +30,7 @@
     "throughput": 24050,
     "throughputTimeUnit": "MINUTE",
     "latency": 50,
-    "failureRate": 0.01
+    "failureRate": 0.01,
+    "maxOvershoot": 0.1
   }
 }

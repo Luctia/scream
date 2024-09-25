@@ -109,49 +109,6 @@ public class ResultProcessor {
         return 0;
     }
 
-    private double checkOvershoot(ResourceLimits recentResourceLimits, String fileName) throws Exception {
-        if (highestFailedResources.isEmpty()) {
-            // This means this was the first try, but if we get here it means the tests passed.
-            // Therefore, we slice cpu in half as a default behaviour.
-            return -0.5;
-        }
-//        if (recentResourceLimits.cpu().getNumericalAmount().compareTo(highestFailedResources.get(fileName).cpu().getNumericalAmount()) < 0
-//                || recentResourceLimits.memory().getNumericalAmount().compareTo(highestFailedResources.get(fileName).memory().getNumericalAmount()) < 0) {
-//            throw new Exception("Unexpected behavior: tests passed with fewer resources than previously failed tests.");
-//        }
-        System.out.println("Checking overshoot...");
-        System.out.printf("Recent resource limits: %s%n", recentResourceLimits);
-        System.out.printf("Highest failed resource limits: %s%n", highestFailedResources.get(fileName));
-        double cpuCoefficient = recentResourceLimits.cpu().getNumericalAmount().divide(highestFailedResources.get(fileName).cpu().getNumericalAmount(), RoundingMode.UP).subtract(new BigDecimal("1")).doubleValue();
-        if (cpuCoefficient > 0.1) {
-            return -cpuCoefficient;
-        }
-        double memoryCoefficient = recentResourceLimits.memory().getNumericalAmount().divide(highestFailedResources.get(fileName).memory().getNumericalAmount(), RoundingMode.UP).subtract(new BigDecimal("1")).doubleValue();
-        if (memoryCoefficient > 0.1) {
-            return memoryCoefficient;
-        }
-        return 0;
-    }
-
-    private void updateHighestFailedLimits(String filename, ResourceLimits limits) {
-        if (highestFailedResources.containsKey(filename)) {
-            ResourceLimits currentLimits = highestFailedResources.get(filename);
-            if (currentLimits.cpu().compareTo(limits.cpu()) < 1) {
-                currentLimits = new ResourceLimits(limits.cpu(), currentLimits.memory());
-                highestFailedResources.put(filename, currentLimits);
-            }
-            if (highestFailedResources.get(filename).memory().compareTo(limits.memory()) < 1) {
-                currentLimits = new ResourceLimits(currentLimits.cpu(), limits.memory());
-                highestFailedResources.put(filename, currentLimits);
-            }
-        } else {
-            highestFailedResources.put(filename, limits);
-        }
-//        if (highestFailedResources.containsKey(filename) && (highestFailedResources.get(filename).cpu().compareTo(limits.cpu()) < 1 || highestFailedResources.get(filename).memory().compareTo(limits.memory()) < 1)) {
-//            highestFailedResources.put(filename, limits);
-//        }
-    }
-
     private static String extractId(String filename) {
         return filename.substring(filename.indexOf('_') + 1, filename.indexOf('_', filename.indexOf('_') + 1));
     }
@@ -174,6 +131,7 @@ public class ResultProcessor {
                 configuration.images(),
                 new TestSpecs(
                         configuration.tests().healthCheckUrl(),
+                        configuration.tests().healthCheckTarget(),
                         configuration.tests().ordered(),
                         this.targets.values().stream().filter(t -> !t.done()).map(Target::getCurrentSampler).toList()
                 ),

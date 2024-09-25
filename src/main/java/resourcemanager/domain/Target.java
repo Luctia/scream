@@ -91,7 +91,7 @@ public class Target {
                     this.processTestResults(passed);
                 }
                 else
-                    multiplyMemory(1.1);
+                    multiplyMemory(1 + configuration.performance().maxOvershoot());
                 break;
             case DECREASING_CPU_FAST:
                 System.out.println("Decreasing CPU fast");
@@ -112,7 +112,7 @@ public class Target {
                 if (passed) {
                     finishSampler();
                 } else
-                    multiplyCPU(1.1);
+                    multiplyCPU(1 + configuration.performance().maxOvershoot());
                 break;
         }
     }

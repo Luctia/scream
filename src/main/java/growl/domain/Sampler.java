@@ -20,7 +20,7 @@ public record Sampler(Method method, String targetId, String path, double percen
         if (percentage < 0) {throw new IllegalArgumentException("Percentage cannot be negative");}
     }
 
-    public String toXML(int maxRPS, int MRT, int index) {
+    public String toXML(int maxRPS, int MRT, int index, int port) {
         String bodySection = getBodySection();
         String tstIdentifier = this.method + "_" + targetId + "_" + this.path.replaceAll("/", "") + "_" + index;
         return String.format("""
@@ -41,6 +41,7 @@ public record Sampler(Method method, String targetId, String path, double percen
                 <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="%s" enabled="true">
                 <stringProp name="HTTPSampler.domain">%s</stringProp>
                 <stringProp name="HTTPSampler.protocol">%s</stringProp>
+                <stringProp name="HTTPSampler.port">%s</stringProp>
                 <stringProp name="HTTPSampler.path">%s</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">%s</stringProp>
@@ -101,6 +102,7 @@ public record Sampler(Method method, String targetId, String path, double percen
                 targetId,
                 // TODO choose between http and https
                 "http",
+                port,
                 path,
                 method,
                 requestBody == null ? "false" : "true",

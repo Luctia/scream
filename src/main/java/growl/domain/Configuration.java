@@ -1,8 +1,8 @@
 package growl.domain;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import resourcemanager.domain.Target;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +26,7 @@ public record Configuration(String namespace, List<Image> images, TestSpecs test
     }
 
     public String toXML() {
+        Map<String, Integer> targetPortMap = images.stream().collect(Collectors.toMap(Image::imageId, Image::port));
         return String.format("""
                 <hashTree>
                 <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan">
@@ -38,6 +39,6 @@ public record Configuration(String namespace, List<Image> images, TestSpecs test
                 %s
                 </hashTree>
                 """,
-                tests.toXML(performance));
+                tests.toXML(performance, targetPortMap));
     }
 }

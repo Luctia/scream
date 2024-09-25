@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -34,8 +36,10 @@ public class XMLMakerTest {
                 34.5,
                 null)
         );
-        TestSpecs testSpecs = new TestSpecs(null, true, samplerList);
-        PerformanceDemands performanceDemands = new PerformanceDemands(10000, PerformanceDemands.TimeUnit.MINUTE, 50, 0.01);
+        Map<String, Integer> portMap = new HashMap<>();
+        portMap.put("presentation-tier", 80);
+        TestSpecs testSpecs = new TestSpecs(null, null, true, samplerList);
+        PerformanceDemands performanceDemands = new PerformanceDemands(10000, PerformanceDemands.TimeUnit.MINUTE, 50, 0.01, 0.1);
 
         String expectedXML = """
                 <hashTree>
@@ -159,6 +163,7 @@ public class XMLMakerTest {
                 <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET presentation-tier/endpoint" enabled="true">
                 <stringProp name="HTTPSampler.domain">presentation-tier</stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
+                <stringProp name="HTTPSampler.port">80</stringProp>
                 <stringProp name="HTTPSampler.path">/endpoint</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -327,6 +332,7 @@ public class XMLMakerTest {
                 <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET presentation-tier/endpoint/spec" enabled="true">
                 <stringProp name="HTTPSampler.domain">presentation-tier</stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
+                <stringProp name="HTTPSampler.port">80</stringProp>
                 <stringProp name="HTTPSampler.path">/endpoint/spec</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -440,7 +446,7 @@ public class XMLMakerTest {
                 </hashTree>
                 </hashTree>
                 """;
-        assertEquals(expectedXML, testSpecs.toXML(performanceDemands).replaceAll("\n\n", "\n"));
+        assertEquals(expectedXML, testSpecs.toXML(performanceDemands, portMap).replaceAll("\n\n", "\n"));
     }
 
     @Test
