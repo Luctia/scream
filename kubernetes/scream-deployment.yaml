@@ -2,23 +2,24 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    scream.service: jmeter
-  name: jmeter
+    scream.service: scream
+  name: scream
 spec:
   replicas: 1
   selector:
     matchLabels:
-      scream.service: jmeter
+      scream.service: scream
   template:
     metadata:
       labels:
-        scream.service: jmeter
+        scream.service: scream
     spec:
+      serviceAccountName: screamserviceaccount
       containers:
-        - image: jmetertest
-          name: jmetertest
+        - image: scream
+          name: scream
           imagePullPolicy: Never
-          command: [ "./bin/jmeter", "-n", "-t", "config.jmx" ]
+          command: [ "java", "-jar", "scream-0.0.1-SNAPSHOT.jar" ]
           ports:
             - containerPort: 80
               protocol: TCP

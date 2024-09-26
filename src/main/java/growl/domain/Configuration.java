@@ -1,22 +1,22 @@
 package growl.domain;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import resourcemanager.domain.Target;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Record for representing the highest configuration parameters in the framework.
- * @param platform information about the platform the deploying and benchmarking will take place on. Required
+ * @param namespace information about the namespace the deploying and benchmarking will take place on. Required
  * @param images list of images to be deployed. Required and may not be empty
  * @param tests test specifications. Required
  * @param performance performance demands. Required
  */
-public record Configuration(String platform, List<Image> images, TestSpecs tests, PerformanceDemands performance) {
+public record Configuration(String namespace, List<Image> images, TestSpecs tests, PerformanceDemands performance) {
     public Configuration {
-        Objects.requireNonNull(platform, "platform cannot be null");
+        Objects.requireNonNull(namespace, "namespace cannot be null");
         Objects.requireNonNull(images, "images cannot be null");
-        if (images.isEmpty()) throw new IllegalArgumentException("images should not be empty");
+        if (images.isEmpty()) System.out.println("Warning: images is empty");
 
         Set<String> imageIds = images.stream().map(Image::imageId).collect(Collectors.toSet());
         if (imageIds.size() != images.size()) throw new IllegalArgumentException("Duplicate image IDs");
@@ -26,10 +26,11 @@ public record Configuration(String platform, List<Image> images, TestSpecs tests
     }
 
     public String toXML() {
+        Map<String, Integer> targetPortMap = images.stream().collect(Collectors.toMap(Image::imageId, Image::port));
         return String.format("""
                 <hashTree>
                 <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan">
-                <boolProp name="TestPlan.serialize_threadgroups">%s</boolProp>
+                <boolProp name="TestPlan.serialize_threadgroups">true</boolProp>
                 <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
                 <collectionProp name="Arguments.arguments"/>
                 </elementProp>
@@ -37,6 +38,7 @@ public record Configuration(String platform, List<Image> images, TestSpecs tests
                 </TestPlan>
                 %s
                 </hashTree>
-                """, tests.ordered() ? "true" : "false", tests.toXML(performance));
+                """,
+                tests.toXML(performance, targetPortMap));
     }
 }

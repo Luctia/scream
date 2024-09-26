@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -21,28 +23,30 @@ public class XMLMakerTest {
     void Should_Represent_Multiple_Ordered_Samplers_In_TestSpec_Without_Healthcheck() {
         List<Sampler> samplerList = new ArrayList<>();
         samplerList.add(new Sampler(
-                Sampler.method.GET,
+                Sampler.Method.GET,
                 "presentation-tier",
                 "/endpoint",
                 34.5,
                 null)
         );
         samplerList.add(new Sampler(
-                Sampler.method.GET,
+                Sampler.Method.GET,
                 "presentation-tier",
                 "/endpoint/spec",
                 34.5,
                 null)
         );
-        TestSpecs testSpecs = new TestSpecs(null, true, samplerList);
-        PerformanceDemands performanceDemands = new PerformanceDemands(10000, PerformanceDemands.TimeUnit.MINUTE, 50);
+        Map<String, Integer> portMap = new HashMap<>();
+        portMap.put("presentation-tier", 80);
+        TestSpecs testSpecs = new TestSpecs(null, null, true, samplerList);
+        PerformanceDemands performanceDemands = new PerformanceDemands(10000, PerformanceDemands.TimeUnit.MINUTE, 50, 0.01, 0.1);
 
         String expectedXML = """
                 <hashTree>
                 <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
                 <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierendpoint_0,2,28,0)}</stringProp>
+                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tier_endpoint_0,2,28,0)}</stringProp>
                 <stringProp name="RampUp"></stringProp>
                 <stringProp name="Steps"></stringProp>
                 <stringProp name="Hold">35</stringProp>
@@ -51,7 +55,7 @@ public class XMLMakerTest {
                 <stringProp name="Unit">M</stringProp>
                 </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
                 <hashTree>
-                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tierendpoint_0">
+                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tier_endpoint_0">
                 <collectionProp name="load_profile">
                 <collectionProp name="1">
                 <stringProp name="1">1</stringProp>
@@ -159,6 +163,7 @@ public class XMLMakerTest {
                 <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET presentation-tier/endpoint" enabled="true">
                 <stringProp name="HTTPSampler.domain">presentation-tier</stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
+                <stringProp name="HTTPSampler.port">80</stringProp>
                 <stringProp name="HTTPSampler.path">/endpoint</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -169,11 +174,48 @@ public class XMLMakerTest {
                 </elementProp>
                 </HTTPSamplerProxy>
                 <hashTree/>
+                <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
+                <boolProp name="ResultCollector.error_logging">false</boolProp>
+                <objProp>
+                <name>saveConfig</name>
+                <value class="SampleSaveConfiguration">
+                <time>true</time>
+                <latency>true</latency>
+                <timestamp>true</timestamp>
+                <success>true</success>
+                <label>true</label>
+                <code>true</code>
+                <message>true</message>
+                <threadName>true</threadName>
+                <dataType>true</dataType>
+                <encoding>false</encoding>
+                <assertions>true</assertions>
+                <subresults>true</subresults>
+                <responseData>false</responseData>
+                <samplerData>false</samplerData>
+                <xml>false</xml>
+                <fieldNames>true</fieldNames>
+                <responseHeaders>false</responseHeaders>
+                <requestHeaders>false</requestHeaders>
+                <responseDataOnError>false</responseDataOnError>
+                <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+                <assertionsResultsToSave>0</assertionsResultsToSave>
+                <bytes>true</bytes>
+                <sentBytes>true</sentBytes>
+                <url>true</url>
+                <threadCounts>true</threadCounts>
+                <idleTime>true</idleTime>
+                <connectTime>true</connectTime>
+                </value>
+                </objProp>
+                <stringProp name="filename">GET_presentation-tier_endpoint_0.csv</stringProp>
+                </ResultCollector>
+                <hashTree/>
                 </hashTree>
                 <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
                 <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tierendpointspec_1,2,28,0)}</stringProp>
+                <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tier_endpointspec_1,2,28,0)}</stringProp>
                 <stringProp name="RampUp"></stringProp>
                 <stringProp name="Steps"></stringProp>
                 <stringProp name="Hold">35</stringProp>
@@ -182,7 +224,7 @@ public class XMLMakerTest {
                 <stringProp name="Unit">M</stringProp>
                 </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
                 <hashTree>
-                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tierendpointspec_1">
+                <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tier_endpointspec_1">
                 <collectionProp name="load_profile">
                 <collectionProp name="1">
                 <stringProp name="1">1</stringProp>
@@ -290,6 +332,7 @@ public class XMLMakerTest {
                 <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET presentation-tier/endpoint/spec" enabled="true">
                 <stringProp name="HTTPSampler.domain">presentation-tier</stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
+                <stringProp name="HTTPSampler.port">80</stringProp>
                 <stringProp name="HTTPSampler.path">/endpoint/spec</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -300,10 +343,110 @@ public class XMLMakerTest {
                 </elementProp>
                 </HTTPSamplerProxy>
                 <hashTree/>
+                <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
+                <boolProp name="ResultCollector.error_logging">false</boolProp>
+                <objProp>
+                <name>saveConfig</name>
+                <value class="SampleSaveConfiguration">
+                <time>true</time>
+                <latency>true</latency>
+                <timestamp>true</timestamp>
+                <success>true</success>
+                <label>true</label>
+                <code>true</code>
+                <message>true</message>
+                <threadName>true</threadName>
+                <dataType>true</dataType>
+                <encoding>false</encoding>
+                <assertions>true</assertions>
+                <subresults>true</subresults>
+                <responseData>false</responseData>
+                <samplerData>false</samplerData>
+                <xml>false</xml>
+                <fieldNames>true</fieldNames>
+                <responseHeaders>false</responseHeaders>
+                <requestHeaders>false</requestHeaders>
+                <responseDataOnError>false</responseDataOnError>
+                <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+                <assertionsResultsToSave>0</assertionsResultsToSave>
+                <bytes>true</bytes>
+                <sentBytes>true</sentBytes>
+                <url>true</url>
+                <threadCounts>true</threadCounts>
+                <idleTime>true</idleTime>
+                <connectTime>true</connectTime>
+                </value>
+                </objProp>
+                <stringProp name="filename">GET_presentation-tier_endpointspec_1.csv</stringProp>
+                </ResultCollector>
+                <hashTree/>
+                </hashTree>
+                <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
+                <intProp name="ThreadGroup.num_threads">1</intProp>
+                <intProp name="ThreadGroup.ramp_time">1</intProp>
+                <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+                <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+                <elementProp elementType="LoopController" guiclass="LoopControlPanel" name="ThreadGroup.main_controller" testclass="LoopController" testname="Loop Controller">
+                <stringProp name="LoopController.loops">1</stringProp>
+                <boolProp name="LoopController.continue_forever">false</boolProp>
+                </elementProp>
+                </ThreadGroup>
+                <hashTree>
+                <kg.apc.jmeter.samplers.DummySampler guiclass="kg.apc.jmeter.samplers.DummySamplerGui" testclass="kg.apc.jmeter.samplers.DummySampler" testname="jp@gc - Dummy Sampler">
+                <boolProp name="WAITING">true</boolProp>
+                <boolProp name="SUCCESFULL">true</boolProp>
+                <stringProp name="RESPONSE_CODE">200</stringProp>
+                <stringProp name="RESPONSE_MESSAGE">OK</stringProp>
+                <stringProp name="REQUEST_DATA">Dummy Sampler used to simulate requests and responses without actual network activity. This helps debugging tests.</stringProp>
+                <stringProp name="RESPONSE_DATA">Dummy Sampler used to simulate requests and responses without actual network activity. This helps debugging tests.</stringProp>
+                <stringProp name="RESPONSE_TIME">${__Random(50,500)}</stringProp>
+                <stringProp name="LATENCY">${__Random(1,50)}</stringProp>
+                <stringProp name="CONNECT">${__Random(1,5)}</stringProp>
+                <stringProp name="URL"/>
+                <stringProp name="RESULT_CLASS">org.apache.jmeter.samplers.SampleResult</stringProp>
+                </kg.apc.jmeter.samplers.DummySampler>
+                <hashTree/>
+                <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
+                <boolProp name="ResultCollector.error_logging">false</boolProp>
+                <objProp>
+                <name>saveConfig</name>
+                <value class="SampleSaveConfiguration">
+                <time>true</time>
+                <latency>true</latency>
+                <timestamp>true</timestamp>
+                <success>true</success>
+                <label>true</label>
+                <code>true</code>
+                <message>true</message>
+                <threadName>true</threadName>
+                <dataType>true</dataType>
+                <encoding>false</encoding>
+                <assertions>true</assertions>
+                <subresults>true</subresults>
+                <responseData>false</responseData>
+                <samplerData>false</samplerData>
+                <xml>false</xml>
+                <fieldNames>true</fieldNames>
+                <responseHeaders>false</responseHeaders>
+                <requestHeaders>false</requestHeaders>
+                <responseDataOnError>false</responseDataOnError>
+                <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+                <assertionsResultsToSave>0</assertionsResultsToSave>
+                <bytes>true</bytes>
+                <sentBytes>true</sentBytes>
+                <url>true</url>
+                <threadCounts>true</threadCounts>
+                <idleTime>true</idleTime>
+                <connectTime>true</connectTime>
+                </value>
+                </objProp>
+                <stringProp name="filename">finished.csv</stringProp>
+                </ResultCollector>
+                <hashTree/>
                 </hashTree>
                 </hashTree>
                 """;
-        assertEquals(expectedXML, testSpecs.toXML(performanceDemands).replaceAll("\n\n", "\n"));
+        assertEquals(expectedXML, testSpecs.toXML(performanceDemands, portMap).replaceAll("\n\n", "\n"));
     }
 
     @Test
@@ -372,6 +515,7 @@ public class XMLMakerTest {
         assert config != null;
         XMLMaker.exportXML(config, true);
         try {
+            String a = Files.readString(Path.of("config.jmx"));
             assertEquals(
                     expectedOutput,
                     Files.readString(Path.of("config.jmx"))

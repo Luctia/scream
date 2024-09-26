@@ -2,9 +2,15 @@ package growl;
 
 import growl.domain.Configuration;
 import growl.domain.Image;
+import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import resourcemanager.domain.ResourceLimits;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KubernetesMaker {
     private static final String JMETER_DEPLOYMENT_FILE = """
@@ -80,11 +86,11 @@ public class KubernetesMaker {
     public static void generateK8sConfig(Configuration configuration) {
         PrintWriter writer;
         try {
-            writer = new PrintWriter("kubernetes/jmeter-deployment.yaml");
+            writer = new PrintWriter("kubernetes/scream-deployment.yaml");
             writer.print(JMETER_DEPLOYMENT_FILE);
             writer.close();
 
-            writer = new PrintWriter("kubernetes/jmeter-service.yaml");
+            writer = new PrintWriter("kubernetes/scream-service.yaml");
             writer.print(String.format(SERVICE_TEMPLATE, "jmeter", "jmeter", "jmeter"));
             writer.close();
         } catch (IOException e) {
@@ -105,5 +111,104 @@ public class KubernetesMaker {
                 System.err.println("Could not create config.jmx file");
             }
         }
+    }
+
+    public static List<Deployment> generateDeployments(Configuration configuration) {
+        ResourceRequirements defaultLimits = new ResourceLimits(new Quantity("500m"), new Quantity("1M")).toResourceRequirements();
+        return configuration.images().stream().map(i -> generateDeployment(i, defaultLimits)).toList();
+    }
+
+    public static Deployment generateDeployment(Image image, ResourceRequirements resourceRequirements) {
+        // @formatter:off
+        return new DeploymentBuilder()
+                .withNewMetadata()
+                    .withName(image.containerId())
+                    .addToLabels("scream.service", image.containerId())
+                .endMetadata()
+                .withNewSpec()
+                    .withReplicas(image.minNumInstances())
+                    .withNewTemplate()
+                        .withNewMetadata()
+                            .addToLabels("scream.service", image.containerId())
+                        .endMetadata()
+                        .withNewSpec()
+                        .addNewContainer()
+                            .withName(image.containerId())
+//                            .addToEnv((EnvVar[]) image.env().entrySet().stream().map(e -> new EnvVarBuilder().withName(e.getKey()).withValue(e.getValue()).build()).toArray(new EnvVar[3]))
+                            .withImage(image.imageId())
+                            .withImagePullPolicy("Never")
+                            .withResources(resourceRequirements)
+                            .addNewPort()
+                                .withProtocol("TCP")
+                                .withContainerPort(image.port())
+                            .endPort()
+                        .endContainer()
+                    .endSpec()
+                .endTemplate()
+                .withNewSelector()
+                    .addToMatchLabels("scream.service", image.containerId())
+                .endSelector()
+                .endSpec()
+                .build();
+        // @formatter:on
+    }
+
+    public static Deployment generateJMeterDeployment() {
+        // @formatter:off
+        return new DeploymentBuilder()
+                .withNewMetadata()
+                    .withName("jmeter")
+                    .addToLabels("scream.service", "jmeter")
+                .endMetadata()
+                .withNewSpec()
+                    .withReplicas(1)
+                    .withNewTemplate()
+                        .withNewMetadata()
+                            .addToLabels("scream.service", "jmeter")
+                        .endMetadata()
+                        .withNewSpec()
+                        .addNewContainer()
+                            .withName("jmeter")
+                            .withImage("jmetertest")
+                            .withImagePullPolicy("Never")
+                            .addNewPort()
+                                .withProtocol("TCP")
+                                .withContainerPort(80)
+                            .endPort()
+                            .withCommand("./bin/jmeter", "-n", "-t", "config.jmx")
+                        .endContainer()
+                    .endSpec()
+                .endTemplate()
+                .withNewSelector()
+                    .addToMatchLabels("scream.service", "jmeter")
+                .endSelector()
+                .endSpec()
+                .build();
+        // @formatter:on
+    }
+
+    public static List<Service> generateServices(Configuration configuration) {
+        List<Service> services = new ArrayList<>();
+        for (Image image : configuration.images()) {
+            // @formatter:off
+            services.add(
+                    new ServiceBuilder()
+                            .withNewMetadata()
+                                .withName(image.containerId())
+                                .addToLabels("scream.service", image.containerId())
+                            .endMetadata()
+                            .withNewSpec()
+                                .addNewPort()
+                                    .withName("80")
+                                    .withTargetPort(new IntOrString(80))
+                                    .withPort(80)
+                                .endPort()
+                                .addToSelector("scream.service", image.containerId())
+                            .endSpec()
+                            .build()
+            );
+            // @formatter:on
+        }
+        return services;
     }
 }

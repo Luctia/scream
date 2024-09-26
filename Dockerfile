@@ -13,7 +13,10 @@ RUN java -cp /jmeter/lib/ext/jmeter-plugins-manager-1.10.jar org.jmeterplugins.r
 WORKDIR /jmeter
 
 # Install plugins
-RUN ./bin/PluginsManagerCMD.sh install jpgc-tst=2.6,jpgc-casutg=2.10
+RUN ./bin/PluginsManagerCMD.sh install jpgc-tst=2.6,jpgc-casutg=2.10,jpgc-dummy=0.4
 
 # Copy config file into the container
-COPY config.jmx config.jmx
+COPY config.json config.json
+
+# Copy the jar into the container
+COPY target/scream-0.0.1-SNAPSHOT.jar scream-0.0.1-SNAPSHOT.jar

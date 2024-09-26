@@ -1,17 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?><jmeterTestPlan jmeter="5.6.3" properties="5.0" version="1.2">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan">
-      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">true</boolProp>
       <elementProp elementType="Arguments" guiclass="ArgumentsPanel" name="TestPlan.user_defined_variables" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
     </TestPlan>
     <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Health check thread group">
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp elementType="LoopController" guiclass="LoopControlPanel" name="ThreadGroup.main_controller" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <WhileController enabled="true" guiclass="WhileControllerGui" testclass="WhileController" testname="Wait for health check to succeed">
+          <stringProp name="WhileController.condition">${__jexl3("${responseCode}" != 200,)}</stringProp>
+        </WhileController>
+        <hashTree>
+          <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Health check">
+            <stringProp name="HTTPSampler.domain">presentation-tier</stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.port">8080</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/ping</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp elementType="Arguments" guiclass="HTTPArgumentsPanel" name="HTTPsampler.Arguments" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <RegexExtractor enabled="true" guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor">
+              <stringProp name="RegexExtractor.useHeaders">code</stringProp>
+              <stringProp name="RegexExtractor.refname">responseCode</stringProp>
+              <stringProp name="RegexExtractor.regex">(.*)</stringProp>
+              <stringProp name="RegexExtractor.template">$1$</stringProp>
+              <stringProp name="RegexExtractor.default"/>
+              <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+              <stringProp name="RegexExtractor.match_number"/>
+            </RegexExtractor>
+            <hashTree/>
+          </hashTree>
+          <ConstantTimer enabled="true" guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer">
+            <stringProp name="ConstantTimer.delay">1000</stringProp>
+          </ConstantTimer>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
       <com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup guiclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui" testclass="com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" testname="bzm - Concurrency Thread Group">
         <elementProp elementType="com.blazemeter.jmeter.control.VirtualUserController" name="ThreadGroup.main_controller"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">${__tstFeedback(GET_nginxtest_0,10,50,1)}</stringProp>
+        <stringProp name="TargetLevel">${__tstFeedback(GET_presentation-tier_v1policiestestid_0,20,200,4)}</stringProp>
         <stringProp name="RampUp"/>
         <stringProp name="Steps"/>
         <stringProp name="Hold">35</stringProp>
@@ -20,123 +66,230 @@
         <stringProp name="Unit">M</stringProp>
       </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
       <hashTree>
-        <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_nginxtest_0">
+        <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="GET_presentation-tier_v1policiestestid_0">
           <collectionProp name="load_profile">
             <collectionProp name="1">
               <stringProp name="1">1</stringProp>
-              <stringProp name="2">11</stringProp>
+              <stringProp name="2">41</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="2">
-              <stringProp name="1">11</stringProp>
-              <stringProp name="2">11</stringProp>
+              <stringProp name="1">41</stringProp>
+              <stringProp name="2">41</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="3">
-              <stringProp name="1">11</stringProp>
-              <stringProp name="2">21</stringProp>
+              <stringProp name="1">41</stringProp>
+              <stringProp name="2">81</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="4">
-              <stringProp name="1">21</stringProp>
-              <stringProp name="2">21</stringProp>
+              <stringProp name="1">81</stringProp>
+              <stringProp name="2">81</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="5">
-              <stringProp name="1">21</stringProp>
-              <stringProp name="2">31</stringProp>
+              <stringProp name="1">81</stringProp>
+              <stringProp name="2">121</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="6">
-              <stringProp name="1">31</stringProp>
-              <stringProp name="2">31</stringProp>
+              <stringProp name="1">121</stringProp>
+              <stringProp name="2">121</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="7">
-              <stringProp name="1">31</stringProp>
-              <stringProp name="2">41</stringProp>
+              <stringProp name="1">121</stringProp>
+              <stringProp name="2">161</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="8">
-              <stringProp name="1">41</stringProp>
-              <stringProp name="2">41</stringProp>
+              <stringProp name="1">161</stringProp>
+              <stringProp name="2">161</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="9">
-              <stringProp name="1">41</stringProp>
-              <stringProp name="2">51</stringProp>
+              <stringProp name="1">161</stringProp>
+              <stringProp name="2">201</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="10">
-              <stringProp name="1">51</stringProp>
-              <stringProp name="2">51</stringProp>
+              <stringProp name="1">201</stringProp>
+              <stringProp name="2">201</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="11">
-              <stringProp name="1">51</stringProp>
-              <stringProp name="2">61</stringProp>
+              <stringProp name="1">201</stringProp>
+              <stringProp name="2">241</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="12">
-              <stringProp name="1">61</stringProp>
-              <stringProp name="2">61</stringProp>
+              <stringProp name="1">241</stringProp>
+              <stringProp name="2">241</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="13">
-              <stringProp name="1">61</stringProp>
-              <stringProp name="2">71</stringProp>
+              <stringProp name="1">241</stringProp>
+              <stringProp name="2">281</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="14">
-              <stringProp name="1">71</stringProp>
-              <stringProp name="2">71</stringProp>
+              <stringProp name="1">281</stringProp>
+              <stringProp name="2">281</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="15">
-              <stringProp name="1">71</stringProp>
-              <stringProp name="2">81</stringProp>
+              <stringProp name="1">281</stringProp>
+              <stringProp name="2">321</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="16">
-              <stringProp name="1">81</stringProp>
-              <stringProp name="2">81</stringProp>
+              <stringProp name="1">321</stringProp>
+              <stringProp name="2">321</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="17">
-              <stringProp name="1">81</stringProp>
-              <stringProp name="2">91</stringProp>
+              <stringProp name="1">321</stringProp>
+              <stringProp name="2">361</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="18">
-              <stringProp name="1">91</stringProp>
-              <stringProp name="2">91</stringProp>
+              <stringProp name="1">361</stringProp>
+              <stringProp name="2">361</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="19">
-              <stringProp name="1">91</stringProp>
-              <stringProp name="2">101</stringProp>
+              <stringProp name="1">361</stringProp>
+              <stringProp name="2">401</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
             <collectionProp name="20">
-              <stringProp name="1">101</stringProp>
-              <stringProp name="2">101</stringProp>
+              <stringProp name="1">401</stringProp>
+              <stringProp name="2">401</stringProp>
               <stringProp name="54">3</stringProp>
             </collectionProp>
           </collectionProp>
         </kg.apc.jmeter.timers.VariableThroughputTimer>
         <hashTree/>
-        <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET nginx/test">
-          <stringProp name="HTTPSampler.domain">nginx</stringProp>
+        <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET presentation-tier/v1/policies/testid">
+          <stringProp name="HTTPSampler.domain">presentation-tier</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
-          <stringProp name="HTTPSampler.path">/test</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.path">/v1/policies/testid</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-          <elementProp elementType="Arguments" guiclass="HTTPArgumentsPanel" name="HTTPsampler.Arguments" testclass="Arguments" testname="User Defined Variables">
-            <collectionProp name="Arguments.arguments"/>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp elementType="Arguments" name="HTTPsampler.Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp elementType="HTTPArgument" name="">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{"someProperty": true}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
           </elementProp>
         </HTTPSamplerProxy>
+        <hashTree/>
+        <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename">GET_presentation-tier_v1policiestestid_0.csv</stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp elementType="LoopController" guiclass="LoopControlPanel" name="ThreadGroup.main_controller" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <kg.apc.jmeter.samplers.DummySampler guiclass="kg.apc.jmeter.samplers.DummySamplerGui" testclass="kg.apc.jmeter.samplers.DummySampler" testname="jp@gc - Dummy Sampler">
+          <boolProp name="WAITING">true</boolProp>
+          <boolProp name="SUCCESFULL">true</boolProp>
+          <stringProp name="RESPONSE_CODE">200</stringProp>
+          <stringProp name="RESPONSE_MESSAGE">OK</stringProp>
+          <stringProp name="REQUEST_DATA">Dummy Sampler used to simulate requests and responses without actual network activity. This helps debugging tests.</stringProp>
+          <stringProp name="RESPONSE_DATA">Dummy Sampler used to simulate requests and responses without actual network activity. This helps debugging tests.</stringProp>
+          <stringProp name="RESPONSE_TIME">${__Random(50,500)}</stringProp>
+          <stringProp name="LATENCY">${__Random(1,50)}</stringProp>
+          <stringProp name="CONNECT">${__Random(1,5)}</stringProp>
+          <stringProp name="URL"/>
+          <stringProp name="RESULT_CLASS">org.apache.jmeter.samplers.SampleResult</stringProp>
+        </kg.apc.jmeter.samplers.DummySampler>
+        <hashTree/>
+        <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename">finished.csv</stringProp>
+        </ResultCollector>
         <hashTree/>
       </hashTree>
     </hashTree>

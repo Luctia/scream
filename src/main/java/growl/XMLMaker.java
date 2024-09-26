@@ -12,6 +12,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -24,7 +25,7 @@ public class XMLMaker {
      * @param configuration the configuration to be used
      * @return the resulting XML as a string
      */
-    static String createTestplanXML(Configuration configuration, boolean prettyPrint) {
+    public static String createTestplanXML(Configuration configuration, boolean prettyPrint) {
         String uglyXML = String.format("""
                 <?xml version="1.0" encoding="UTF-8"?>
                 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
@@ -38,7 +39,7 @@ public class XMLMaker {
      * Export the configuration as a JMeter-compatible Testplan XML file.
      * @param configuration the configuration to be used
      */
-    static void exportXML(Configuration configuration, boolean prettyPrint) {
+    public static void exportXML(Configuration configuration, boolean prettyPrint) {
         String xml = createTestplanXML(configuration, prettyPrint);
         try {
             PrintWriter writer = new PrintWriter("config.jmx");
@@ -63,12 +64,12 @@ public class XMLMaker {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             transformerFactory.setAttribute("indent-number", 2);
 
-            File xslFile = new File("src/main/resources/prettyprint.xsl");
-            Scanner reader = new Scanner(xslFile);
+            Scanner reader = new Scanner(Objects.requireNonNull(XMLMaker.class.getClassLoader().getResourceAsStream("prettyprint.xsl")));
             StringBuilder xslt = new StringBuilder();
             while (reader.hasNextLine()) {
                 xslt.append(reader.nextLine());
             }
+            // dException: nested:/jmeter/scream-0.0.1-SNAPSHOT.jar/!BOOT-INF/classes/!/prettyprint.xsl (No such file or
             reader.close();
             Transformer transformer = transformerFactory.newTransformer(new StreamSource(new StringReader(xslt.toString())));
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
