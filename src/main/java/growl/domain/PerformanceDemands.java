@@ -18,6 +18,6 @@ public record PerformanceDemands(int throughput, TimeUnit throughputTimeUnit, in
         if (throughput < 0) {throw new IllegalArgumentException("Throughput cannot be negative");}
         if (latency < 0) {throw new IllegalArgumentException("Latency cannot be negative");}
         if (failureRate < 0) {throw new IllegalArgumentException("Failure rate cannot be negative");}
-        if (maxOvershoot == 0) {maxOvershoot = 0.1;}
+        if (maxOvershoot <= 0) {maxOvershoot = 0.1;}
     }
 }
