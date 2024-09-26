@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import resourcemanager.ResourceManager;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * This class serves as the starting point from which the framework will do its job.
@@ -16,7 +15,7 @@ import java.io.IOException;
 @SpringBootApplication
 @EnableAsync
 public class Orchestrator {
-     public static void main(String[] args) throws IOException {
+     public static void main(String[] args) {
          System.out.println("Starting...");
          // We start by using the growl package to turn the JSON config into a JMeter configuration.
          Configuration configuration = ConfigurationMaker.makeConfigurationFromFilename("config.json");

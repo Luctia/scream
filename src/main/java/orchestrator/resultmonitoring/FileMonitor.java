@@ -66,7 +66,7 @@ public class FileMonitor {
                 key.reset();
             }
             System.out.println("Optimal resource limits found:");
-            processor.printResources(configuration);
+            processor.printResources();
             TimeUnit.MINUTES.sleep(60);
         } catch (InterruptedException e) {
             System.out.println("Interrupted while watching file monitoring");

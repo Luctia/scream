@@ -37,7 +37,7 @@ public class ResourceManager {
         }
     }
 
-    public static ResourceLimits getResourceLimits(String podName, Configuration config) throws Exception {
+    public static ResourceLimits getResourceLimits(String podName, Configuration config) {
         try (KubernetesClient k8s = new KubernetesClientBuilder().build()) {
             NonNamespaceOperation<Pod, PodList, PodResource> pods = k8s.pods().inNamespace(config.namespace());
             List<Pod> candidates = new ArrayList<>();

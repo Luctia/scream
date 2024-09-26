@@ -21,12 +21,14 @@
         "method": "GET",
         "targetId": "presentation-tier",
         "path": "/v1/policies/testid",
+        "https": false,
         "percentage": 34.6
       },
       {
         "method": "PUT",
         "targetId": "presentation-tier",
         "path": "/v1/users",
+        "https": false,
         "percentage": 65.4,
         "requestBody": "{\"someProperty\": true}"
       }

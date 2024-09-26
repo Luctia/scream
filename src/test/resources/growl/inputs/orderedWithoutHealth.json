@@ -19,6 +19,7 @@
         "method": "GET",
         "targetId": "presentation-tier",
         "path": "/v1/policies/testid",
+        "https": true,
         "percentage": 99.9,
         "requestBody": "{\"someProperty\": true}"
       }

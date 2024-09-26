@@ -116,10 +116,10 @@ public class ConfigurationMakerTest {
         // Start with required fields
         assertThrows(NullPointerException.class, () -> new Configuration(null, new ArrayList<>(), null, null));
         assertThrows(NullPointerException.class, () -> new Image(null, null, 0, false, 0, null));
-        assertThrows(NullPointerException.class, () -> new TestSpecs(null, null, false, null));
-        assertThrows(NullPointerException.class, () -> new Sampler(null, null, null, 0, null));
+        assertThrows(NullPointerException.class, () -> new TestSpecs(null, null, false, false, null));
+        assertThrows(NullPointerException.class, () -> new Sampler(null, null, null, false, 0, null));
 
-        assertThrows(IllegalArgumentException.class, () -> new TestSpecs(null, null, false, new ArrayList<>()));
+        assertThrows(IllegalArgumentException.class, () -> new TestSpecs(null, null, false, false, new ArrayList<>()));
 
         // Test not-negative requirements
         assertThrows(IllegalArgumentException.class, () -> new Image("id", "id", -1, false, 1, null));
@@ -132,7 +132,7 @@ public class ConfigurationMakerTest {
         assertThrows(IllegalArgumentException.class, () -> new PerformanceDemands(0, null, -1, 0, 0.1));
         assertThrows(IllegalArgumentException.class, () -> new PerformanceDemands(0, null, 0, -1, 0.1));
 
-        assertThrows(IllegalArgumentException.class, () -> new Sampler(null, null, "", -1, null));
+        assertThrows(IllegalArgumentException.class, () -> new Sampler(null, null, "", false, -1, null));
 
         // Test no image ID duplicates
         assertThrows(IllegalArgumentException.class, () -> {

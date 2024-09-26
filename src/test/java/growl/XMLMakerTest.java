@@ -26,6 +26,7 @@ public class XMLMakerTest {
                 Sampler.Method.GET,
                 "presentation-tier",
                 "/endpoint",
+                false,
                 34.5,
                 null)
         );
@@ -33,12 +34,13 @@ public class XMLMakerTest {
                 Sampler.Method.GET,
                 "presentation-tier",
                 "/endpoint/spec",
+                false,
                 34.5,
                 null)
         );
         Map<String, Integer> portMap = new HashMap<>();
         portMap.put("presentation-tier", 80);
-        TestSpecs testSpecs = new TestSpecs(null, null, true, samplerList);
+        TestSpecs testSpecs = new TestSpecs(null, null, false, true, samplerList);
         PerformanceDemands performanceDemands = new PerformanceDemands(10000, PerformanceDemands.TimeUnit.MINUTE, 50, 0.01, 0.1);
 
         String expectedXML = """
@@ -515,7 +517,6 @@ public class XMLMakerTest {
         assert config != null;
         XMLMaker.exportXML(config, true);
         try {
-            String a = Files.readString(Path.of("config.jmx"));
             assertEquals(
                     expectedOutput,
                     Files.readString(Path.of("config.jmx"))

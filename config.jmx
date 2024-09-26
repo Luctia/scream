@@ -25,7 +25,7 @@
         <hashTree>
           <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Health check">
             <stringProp name="HTTPSampler.domain">presentation-tier</stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.port">8080</stringProp>
             <stringProp name="HTTPSampler.path">/v1/ping</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>

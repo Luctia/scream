@@ -1,7 +1,5 @@
 package growl.domain;
 
-import resourcemanager.domain.Target;
-
 import java.util.*;
 import java.util.stream.Collectors;
 

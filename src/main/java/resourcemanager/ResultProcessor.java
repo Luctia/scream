@@ -2,17 +2,14 @@ package resourcemanager;
 
 import growl.domain.Configuration;
 import growl.domain.PerformanceDemands;
+import growl.domain.Sampler;
 import growl.domain.TestSpecs;
-import io.fabric8.kubernetes.api.model.Quantity;
-import resourcemanager.domain.ResourceLimits;
 import resourcemanager.domain.Target;
 import resourcemanager.domain.TestResult;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -21,24 +18,13 @@ import java.util.stream.Collectors;
 import static growl.XMLMaker.createTestplanXML;
 
 public class ResultProcessor {
-    /**
-     * The resource limits that have been used for the corresponding service. These are updated before benchmarking is
-     * run with these limits.
-     */
-    private Map<String, ResourceLimits> usedResourceLimits = new HashMap<>();
-    /**
-     * The highest tried resource limits for the corresponding service (filename) with which the benchmarking tests
-     * failed.
-     */
-    private final Map<String, ResourceLimits> highestFailedResources = new HashMap<>();
-
-    private Map<String, Target> targets;
-    private Configuration configuration;
+    private final Map<String, Target> targets;
+    private final Configuration configuration;
 
     public ResultProcessor(Configuration configuration) {
         this.configuration = configuration;
         this.targets = configuration.tests().samplers().stream()
-                .collect(Collectors.groupingBy(s -> s.targetId()))
+                .collect(Collectors.groupingBy(Sampler::targetId))
                 .entrySet().stream()
                 .map(e -> new Target(e.getKey(), e.getValue(), configuration))
                 .collect(Collectors.toMap(Target::getTargetId, target -> target));
@@ -113,7 +99,7 @@ public class ResultProcessor {
         return filename.substring(filename.indexOf('_') + 1, filename.indexOf('_', filename.indexOf('_') + 1));
     }
 
-    public void printResources(Configuration configuration) throws Exception {
+    public void printResources() {
         if (!this.targets.entrySet().stream().allMatch(e -> e.getValue().done())) {
             System.out.println("No resource limits yet");
         }
@@ -132,6 +118,7 @@ public class ResultProcessor {
                 new TestSpecs(
                         configuration.tests().healthCheckUrl(),
                         configuration.tests().healthCheckTarget(),
+                        configuration.tests().healthCheckHttps(),
                         configuration.tests().ordered(),
                         this.targets.values().stream().filter(t -> !t.done()).map(Target::getCurrentSampler).toList()
                 ),

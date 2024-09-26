@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TestResult {
-    public List<TestResultLine> testResultLines;
+    public final List<TestResultLine> testResultLines;
 
     public TestResult(List<TestResultLine> testResultLines) {
         this.testResultLines = testResultLines;
@@ -82,20 +82,6 @@ public class TestResult {
         long startingTime = this.testResultLines.getLast().timeStamp - phaseDuration;
         return this.testResultLines.stream().filter(l -> l.timeStamp < startingTime).mapToDouble(l -> l.latency).sum() /
                 (this.testResultLines.stream().filter(l -> l.timeStamp < startingTime).count());
-    }
-
-    public String toReport() {
-        return String.format("""
-                        ========= Load testing report =========
-                        Average latency:             %s ms
-                        Latency during last phase:   %s ms
-                        Number of non-200 responses: %s
-                        =======================================
-                        """,
-                this.getAvgLatency(),
-                this.getLastLatency(),
-                this.getFailedRequests().size()
-        );
     }
 
     public record TestResultLine(long timeStamp, int elapsed, String label, int responseCode, String responseMessage,

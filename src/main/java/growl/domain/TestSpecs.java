@@ -12,7 +12,7 @@ import java.util.Objects;
  * @param ordered        whether to execute all tests in the sequence they were given. Defaults to false
  * @param samplers       list of samplers. Required and should not be empty
  */
-public record TestSpecs(String healthCheckUrl, String healthCheckTarget, boolean ordered, List<Sampler> samplers) {
+public record TestSpecs(String healthCheckUrl, String healthCheckTarget, boolean healthCheckHttps, boolean ordered, List<Sampler> samplers) {
     public TestSpecs {
         Objects.requireNonNull(samplers, "samplers cannot be null");
         if (samplers.isEmpty()) throw new IllegalArgumentException("samplers may not be empty");
@@ -146,7 +146,6 @@ public record TestSpecs(String healthCheckUrl, String healthCheckTarget, boolean
                 </hashTree>
                 </hashTree>
                 """;
-        // TODO determine protocol
-        return String.format(base, healthCheckTarget, "http", port, healthCheckUrl);
+        return String.format(base, healthCheckTarget, healthCheckHttps ? "https" : "http", port, healthCheckUrl);
     }
 }

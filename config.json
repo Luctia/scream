@@ -17,16 +17,19 @@
         "method": "GET",
         "targetId": "load",
         "path": "/encrypt",
+        "https": false,
         "percentage": 100
       },{
         "method": "GET",
         "targetId": "load",
         "path": "/fillup",
+        "https": false,
         "percentage": 100
       },{
         "method": "GET",
         "targetId": "load",
         "path": "/both",
+        "https": false,
         "percentage": 100
       }
     ]
