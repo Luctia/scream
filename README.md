@@ -3,10 +3,8 @@
 ## How-to
 ### Configuration
 First, you must write your configuration in the GROWL DSL. Examples of this can be found in
-`src/test/resources/growl/inputs`. When you have a complete configuration, you can run the application. This will
-generate a `.jmx` file that will be used by JMeter.
+`src/test/resources/growl/inputs`.
 
 ### Running with Kubernetes
-First, the JMeter Docker image must be built using `docker build -t scream .`. This will create a runnable Java Docker
-image that will be used by Kubernetes. You can then deploy this image using the pre-made Kubernetes configuration files
-in `/kubernetes`
+First, a JAR must be built using `mvn package`. You can then build the Docker image using `docker build -t scream .`. 
+Then you can start using SCREAM in Kubernetes by running `kubectl apply -f .\kubernetes\`.
