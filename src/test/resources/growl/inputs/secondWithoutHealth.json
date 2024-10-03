@@ -13,29 +13,19 @@
     }
   ],
   "tests": {
-    "healthCheckUrl": "/v1/ping",
-    "healthCheckTarget": "presentation-tier",
-    "ordered": true,
     "samplers": [
       {
         "method": "GET",
         "targetId": "presentation-tier",
         "path": "/v1/policies/testid",
         "https": false,
-        "percentage": 34.6
-      },
-      {
-        "method": "PUT",
-        "targetId": "presentation-tier",
-        "path": "/v1/users",
-        "https": false,
-        "percentage": 65.4,
+        "percentage": 99.9,
         "requestBody": "{\"someProperty\": true}"
       }
     ]
   },
   "performance": {
-    "throughput": 10000,
+    "throughput": 24050,
     "throughputTimeUnit": "MINUTE",
     "latency": 50,
     "failureRate": 0.01,

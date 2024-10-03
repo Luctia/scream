@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class XMLMakerTest {
 
     @Test
-    void Should_Represent_Multiple_Ordered_Samplers_In_TestSpec_Without_Healthcheck() {
+    void Should_Represent_Multiple_Samplers_In_TestSpec_Without_Healthcheck() {
         List<Sampler> samplerList = new ArrayList<>();
         samplerList.add(new Sampler(
                 Sampler.Method.GET,
@@ -40,7 +40,7 @@ public class XMLMakerTest {
         );
         Map<String, Integer> portMap = new HashMap<>();
         portMap.put("presentation-tier", 80);
-        TestSpecs testSpecs = new TestSpecs(null, null, false, true, samplerList);
+        TestSpecs testSpecs = new TestSpecs(null, null, false, samplerList);
         PerformanceDemands performanceDemands = new PerformanceDemands(10000, PerformanceDemands.TimeUnit.MINUTE, 50, 0.01, 0.1);
 
         String expectedXML = """
@@ -452,11 +452,11 @@ public class XMLMakerTest {
     }
 
     @Test
-    void Should_Represent_Ordered_With_Health_Check() {
-        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/orderedWithHealthCheckAndRampUp.json");
+    void Should_Represent_With_Health_Check() {
+        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/withHealthCheckAndRampUp.json");
         String expectedOutput = "";
         try {
-            expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/orderedWithHealthCheckAndRampUp.jmx"));
+            expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/withHealthCheckAndRampUp.jmx"));
         } catch (IOException e) {
             fail("File containing expected output not found");
         }
@@ -470,11 +470,11 @@ public class XMLMakerTest {
     }
 
     @Test
-    void Should_Properly_Construct_XML_Ordered_Without_Health() {
-        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/orderedWithoutHealth.json");
+    void Should_Properly_Construct_XML_Without_Health() {
+        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/withoutHealth.json");
         String expectedOutput = "";
         try {
-            expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/orderedWithoutHealth.jmx"));
+            expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/withoutHealth.jmx"));
         } catch (IOException e) {
             fail("File containing expected output not found");
         }
@@ -488,11 +488,11 @@ public class XMLMakerTest {
     }
 
     @Test
-    void Should_Properly_Construct_XML_Unordered_Without_Health() {
-        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/unorderedWithoutHealth.json");
+    void Should_Properly_Construct_XML_Without_Health_Second() {
+        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/secondWithoutHealth.json");
         String expectedOutput = "";
         try {
-            expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/unorderedWithoutHealth.jmx"));
+            expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/secondWithoutHealth.jmx"));
         } catch (IOException e) {
             fail("File containing expected output not found");
         }
@@ -506,11 +506,11 @@ public class XMLMakerTest {
     }
 
     @Test
-    void Should_Pretty_Print_To_File_Unordered_With_Health() {
-        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/unorderedWithHealth.json");
+    void Should_Pretty_Print_To_File_With_Health() {
+        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/withHealth.json");
         String expectedOutput = "";
         try {
-            expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/unorderedWithHealth.jmx"));
+            expectedOutput = Files.readString(Path.of("src/test/resources/growl/outputs/withHealth.jmx"));
         } catch (IOException e) {
             fail("File containing expected output not found");
         }

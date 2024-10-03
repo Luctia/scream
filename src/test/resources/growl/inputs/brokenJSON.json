@@ -14,7 +14,6 @@
   ],
   "tests": {
     "healthCheckUrl": "/v1/ping",
-    "ordered": false,
     "samplers": [
       {
         "method": "GET",

@@ -119,7 +119,6 @@ public class ResultProcessor {
                         configuration.tests().healthCheckUrl(),
                         configuration.tests().healthCheckTarget(),
                         configuration.tests().healthCheckHttps(),
-                        configuration.tests().ordered(),
                         this.targets.values().stream().filter(t -> !t.done()).map(Target::getCurrentSampler).toList()
                 ),
                 configuration.performance());

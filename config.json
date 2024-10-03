@@ -11,7 +11,6 @@
   "tests": {
     "healthCheckUrl": "/actuator/health",
     "healthCheckTarget": "load",
-    "ordered": false,
     "samplers": [
       {
         "method": "GET",

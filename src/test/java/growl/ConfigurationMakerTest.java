@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ConfigurationMakerTest {
     @Test
     void Should_Parse_Simple_Configuration_From_JSON_File() {
-        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/unorderedWithHealth.json");
+        Configuration config = ConfigurationMaker.makeConfigurationFromFilename("src/test/resources/growl/inputs/withHealth.json");
         assertNotNull(config);
         assertEquals("default", config.namespace());
         assertEquals("presentation-tier", config.images().getFirst().imageId());
@@ -25,7 +25,6 @@ public class ConfigurationMakerTest {
         assertEquals("{test/logical-tier}", config.images().getFirst().env().get("LOGICAL_ENDPOINT"));
 
         assertEquals("/v1/ping", config.tests().healthCheckUrl());
-        assertFalse(config.tests().ordered());
 
         assertEquals(1, config.tests().samplers().size());
         assertEquals(Sampler.Method.GET, config.tests().samplers().getFirst().method());
@@ -57,7 +56,6 @@ public class ConfigurationMakerTest {
                   ],
                   "tests": {
                     "healthCheckUrl": "/v1/ping",
-                    "ordered": false,
                     "samplers": [
                       {
                         "method": "GET",
@@ -88,7 +86,6 @@ public class ConfigurationMakerTest {
         assertEquals("{test/logical-tier}", config.images().getFirst().env().get("LOGICAL_ENDPOINT"));
 
         assertEquals("/v1/ping", config.tests().healthCheckUrl());
-        assertFalse(config.tests().ordered());
 
         assertEquals(1, config.tests().samplers().size());
         assertEquals(Sampler.Method.GET, config.tests().samplers().getFirst().method());
@@ -116,10 +113,10 @@ public class ConfigurationMakerTest {
         // Start with required fields
         assertThrows(NullPointerException.class, () -> new Configuration(null, new ArrayList<>(), null, null));
         assertThrows(NullPointerException.class, () -> new Image(null, null, 0, false, 0, null));
-        assertThrows(NullPointerException.class, () -> new TestSpecs(null, null, false, false, null));
+        assertThrows(NullPointerException.class, () -> new TestSpecs(null, null, false, null));
         assertThrows(NullPointerException.class, () -> new Sampler(null, null, null, false, 0, null));
 
-        assertThrows(IllegalArgumentException.class, () -> new TestSpecs(null, null, false, false, new ArrayList<>()));
+        assertThrows(IllegalArgumentException.class, () -> new TestSpecs(null, null, false, new ArrayList<>()));
 
         // Test not-negative requirements
         assertThrows(IllegalArgumentException.class, () -> new Image("id", "id", -1, false, 1, null));

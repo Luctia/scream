@@ -15,21 +15,26 @@
   "tests": {
     "healthCheckUrl": "/v1/ping",
     "healthCheckTarget": "presentation-tier",
-    "healthCheckHttps": true,
-    "ordered": false,
     "samplers": [
       {
         "method": "GET",
         "targetId": "presentation-tier",
         "path": "/v1/policies/testid",
         "https": false,
-        "percentage": 99.9,
+        "percentage": 34.6
+      },
+      {
+        "method": "PUT",
+        "targetId": "presentation-tier",
+        "path": "/v1/users",
+        "https": false,
+        "percentage": 65.4,
         "requestBody": "{\"someProperty\": true}"
       }
     ]
   },
   "performance": {
-    "throughput": 24050,
+    "throughput": 10000,
     "throughputTimeUnit": "MINUTE",
     "latency": 50,
     "failureRate": 0.01,
