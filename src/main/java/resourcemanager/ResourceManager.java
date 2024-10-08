@@ -20,10 +20,13 @@ public class ResourceManager {
         try (KubernetesClient k8s = new KubernetesClientBuilder().build()) {
             try {
                 ResourceLimits oldLimits = getResourceLimits(serviceName, config);
-                Deployment replacementWithNewLimits = KubernetesMaker.generateDeployment(config.images().stream().filter(i -> i.containerId().equals(serviceName)).findFirst().orElseThrow(), resourceLimits.toResourceRequirements());
-                System.out.printf("Resources to be set at %s%n", resourceLimits);
+                Deployment replacementWithNewLimits = KubernetesMaker.generateDeployment(
+                        config.images().stream()
+                                .filter(i -> i.containerId().equals(serviceName))
+                                .findFirst()
+                                .orElseThrow(), resourceLimits.toResourceRequirements());
                 k8s.apps().deployments().inNamespace(config.namespace()).resource(replacementWithNewLimits).forceConflicts().serverSideApply();
-                System.out.println("Actual resources:");
+                System.out.println("Resources set at:");
                 for (int i = 0; i < 20; i++) {
                     TimeUnit.SECONDS.sleep(5);
                     if (!getResourceLimits(serviceName, config).equals(oldLimits)) {

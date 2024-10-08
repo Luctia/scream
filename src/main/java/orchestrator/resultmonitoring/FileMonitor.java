@@ -34,10 +34,10 @@ public class FileMonitor {
     @Async
     @PostConstruct
     public void launchMonitoring() throws IOException {
-        System.out.println("START_MONITORING");
         ResultProcessor processor = new ResultProcessor(configuration);
         processor.buildConfig();
         Runtime.getRuntime().exec(new String[]{"./bin/jmeter", "-n", "-t", "config.jmx"});
+        System.out.println("START_MONITORING");
         try {
             WatchKey key;
             while ((key = watchService.take()) != null && !finished) {
@@ -51,8 +51,7 @@ public class FileMonitor {
                             //  (one for CSV headers and a first result). This means JMeter is done.
                             resultFiles.remove("finished.csv");
                             finished = processor.processNewResults(resultFiles, this.configuration);
-                            System.out.println("Processing finished");
-                            System.out.println();
+                            System.out.println("Processing finished\n");
                             new File("finished.csv").delete();
                             this.resultFiles.forEach(f -> new File(f).delete());
                             this.resultFiles.clear();

@@ -16,6 +16,14 @@ public class KubernetesMaker {
     }
 
     public static Deployment generateDeployment(Image image, ResourceRequirements resourceRequirements) {
+        EnvVar[] environmentVariables = new EnvVar[image.env().size()];
+        List<String> envNames = image.env().keySet().stream().toList();
+        for (int i = 0; i < image.env().size(); i++) {
+            environmentVariables[i] = new EnvVarBuilder()
+                    .withName(envNames.get(i))
+                    .withValue(image.env().get(envNames.get(i)))
+                    .build();
+        }
         // @formatter:off
         return new DeploymentBuilder()
                 .withNewMetadata()
@@ -31,7 +39,7 @@ public class KubernetesMaker {
                         .withNewSpec()
                         .addNewContainer()
                             .withName(image.containerId())
-//                            .addToEnv((EnvVar[]) image.env().entrySet().stream().map(e -> new EnvVarBuilder().withName(e.getKey()).withValue(e.getValue()).build()).toArray(new EnvVar[3]))
+                            .addToEnv(environmentVariables)
                             .withImage(image.imageId())
                             .withImagePullPolicy("Never")
                             .withResources(resourceRequirements)
