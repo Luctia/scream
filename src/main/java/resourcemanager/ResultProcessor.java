@@ -58,13 +58,7 @@ public class ResultProcessor {
             }
             for (String filename : testResults.keySet()) {
                 Target target = targets.get(extractId(filename));
-                System.out.println("CSV lines:");
-                System.out.println(fileContents);
-                System.out.println("Result lines:");
-                testResults.get(filename).testResultLines.forEach(System.out::println);
-                System.out.println();
                 boolean pass = evaluatePerformance(configuration.performance(), testResults.get(filename)) == 0;
-                System.out.println("Resulting in a pass: " + (pass ? "yes" : "no"));
                 target.processTestResults(evaluatePerformance(configuration.performance(), testResults.get(filename)) == 0);
                 if (!target.done()) target.applyResourceLimits();
             }
@@ -83,9 +77,7 @@ public class ResultProcessor {
      */
     private double evaluatePerformance(PerformanceDemands demands, TestResult testResult) {
         double failureRate = (double) testResult.getFailedRequests().size() / testResult.testResultLines.size();
-        System.out.printf("Failure rate: %s%n", failureRate);
         if (testResult.getLastLatency() > demands.latency() || failureRate > demands.failureRate()) {
-            System.out.println("Did not pass");
             double naiveRes = testResult.getLastLatency() / demands.latency();
             if (naiveRes == 0) {
                 naiveRes = failureRate;
